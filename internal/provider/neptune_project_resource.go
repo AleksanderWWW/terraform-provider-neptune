@@ -27,10 +27,10 @@ type NeptuneProjectResource struct {
 
 // ExampleResourceModel describes the resource data model.
 type NeptuneProjectResourceModel struct {
-	Name types.String `tfsdk:"name"`
-	Workspace             types.String `tfsdk:"workspace"`
-	Key                    types.String `tfsdk:"key"`
-	Vis types.String `tfsdk:"vis"` 
+	Name      types.String `tfsdk:"name"`
+	Workspace types.String `tfsdk:"workspace"`
+	Key       types.String `tfsdk:"key"`
+	Vis       types.String `tfsdk:"vis"`
 }
 
 func (r *NeptuneProjectResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -93,7 +93,6 @@ func (r *NeptuneProjectResource) Create(ctx context.Context, req resource.Create
 		return
 	}
 
-
 	err := r.client.CreateProject(
 		data.Name.ValueString(),
 		data.Workspace.ValueString(),
@@ -102,12 +101,12 @@ func (r *NeptuneProjectResource) Create(ctx context.Context, req resource.Create
 	)
 
 	if err != nil {
-        resp.Diagnostics.AddError(
-            "Error creating project",
-            "Could not create project, unexpected error: " + err.Error(),
-        )
-        return
-    }
+		resp.Diagnostics.AddError(
+			"Error creating project",
+			"Could not create project, unexpected error: "+err.Error(),
+		)
+		return
+	}
 
 	// Write logs using the tflog package
 	// Documentation: https://terraform.io/plugin/log

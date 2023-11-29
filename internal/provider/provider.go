@@ -5,12 +5,12 @@ package provider
 
 import (
 	"context"
-	"terraform-provider-neptune/neptune"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/provider"
 	"github.com/hashicorp/terraform-plugin-framework/provider/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/types"
+	"terraform-provider-neptune/neptune"
 )
 
 // Ensure ScaffoldingProvider satisfies various provider interfaces.
@@ -27,7 +27,7 @@ type NeptuneProvider struct {
 // ScaffoldingProviderModel describes the provider data model.
 type NeptuneProviderModel struct {
 	ApiToken types.String `tfsdk:"api_token"`
-	Timeout types.Int64 `tfsdk:"timeout"`
+	Timeout  types.Int64  `tfsdk:"timeout"`
 }
 
 func (p *NeptuneProvider) Metadata(ctx context.Context, req provider.MetadataRequest, resp *provider.MetadataResponse) {
@@ -73,14 +73,14 @@ func (p *NeptuneProvider) Configure(ctx context.Context, req provider.ConfigureR
 	// Example client configuration for data sources and resources
 	client, err := neptune.NewNeptuneClient(data.ApiToken.ValueString(), data.Timeout.ValueInt64())
 	if err != nil {
-        resp.Diagnostics.AddError(
-            "Unable to Create Neptune API Client",
-            "An unexpected error occurred when creating the Neptune API client. "+
-                "If the error is not clear, please contact the provider developers.\n\n"+
-                "Neptune Client Error: " + err.Error(),
-        )
-        return
-    }
+		resp.Diagnostics.AddError(
+			"Unable to Create Neptune API Client",
+			"An unexpected error occurred when creating the Neptune API client. "+
+				"If the error is not clear, please contact the provider developers.\n\n"+
+				"Neptune Client Error: "+err.Error(),
+		)
+		return
+	}
 	resp.DataSourceData = client
 	resp.ResourceData = client
 }
