@@ -113,3 +113,30 @@ func formProjectBody(name string, workspaceId string, vis string, key string) ([
 	}
 	return json.Marshal(b)
 }
+
+func (c *NeptuneClient) DeleteProject(name string, workspace string) error {
+	authToken, err := c.getAuthToken()
+	if err != nil {
+		return err
+	}
+
+	headers := map[string]string{
+		"authorization": fmt.Sprintf("Bearer %s", authToken),
+	}
+
+	params := map[string]string{
+		"projectIdentifier": fmt.Sprintf("%s/%s", workspace, name),
+	}
+
+	resp, err := c.do("deleteProject", params, headers, nil)
+
+	if err != nil {
+		return err
+	}
+
+	if resp.StatusCode != 200 {
+		return fmt.Errorf("Error: response status code %d", resp.StatusCode)
+	}
+
+	return nil
+}

@@ -10,5 +10,9 @@
     "listOrganizations": {
         "endpoint": "api/backend/v1/myOrganizations",
         "method": "GET"
+    },
+    "deleteProject": {
+        "endpoint": "api/backend/v1/projects",
+        "method": "DELETE"
     }
 }

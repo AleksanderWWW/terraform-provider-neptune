@@ -170,6 +170,16 @@ func (r *NeptuneProjectResource) Delete(ctx context.Context, req resource.Delete
 		return
 	}
 
+	err := r.client.DeleteProject(data.Name.ValueString(), data.Workspace.ValueString())
+
+	if err != nil {
+		resp.Diagnostics.AddError(
+			"Error deleting project",
+			"Could not delete project, unexpected error: "+err.Error(),
+		)
+		return
+	}
+
 	// If applicable, this is a great opportunity to initialize any necessary
 	// provider client data and make a call using it.
 	// httpResp, err := r.client.Do(httpReq)
