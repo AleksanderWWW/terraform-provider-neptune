@@ -1,0 +1,14 @@
+{
+    "auth": {
+        "endpoint": "api/backend/v1/authorization/oauth-token",
+        "method": "GET"
+    },
+    "createProject": {
+        "endpoint": "api/backend/v1/projects",
+        "method": "POST"
+    },
+    "listOrganizations": {
+        "endpoint": "api/backend/v1/myOrganizations",
+        "method": "GET"
+    }
+}
