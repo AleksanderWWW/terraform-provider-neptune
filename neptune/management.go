@@ -86,6 +86,11 @@ func (c *NeptuneClient) CreateProject(name string, workspace string, key string,
 	if err != nil {
 		return err
 	}
+
+	if resp.StatusCode == 422 {
+		return fmt.Errorf("Error: project '%s' already exists", name)
+	}
+
 	if resp.StatusCode != 200 {
 		return fmt.Errorf("Error: response status code %d", resp.StatusCode)
 	}
