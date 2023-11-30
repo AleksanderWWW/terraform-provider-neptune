@@ -16,10 +16,33 @@ type operationData struct {
 var config map[operationID]operationData
 
 func init() {
-	loadConfig(&config)
+	config = map[operationID]operationData{
+		"auth": {
+			Endpoint: "api/backend/v1/authorization/oauth-token",
+			Method:   "GET",
+		},
+		"createProject": {
+			Endpoint: "api/backend/v1/projects",
+			Method:   "POST",
+		},
+		"listOrganizations": {
+			Endpoint: "api/backend/v1/myOrganizations",
+			Method:   "GET",
+		},
+		"deleteProject": {
+			Endpoint: "api/backend/v1/projects",
+			Method:   "DELETE",
+		},
+		"addProjectMember": {
+			Endpoint: "api/backend/v1/projects/members",
+			Method:   "POST",
+		},
+		"deleteProjectMember": {
+			Endpoint: "api/backend/v1/projects/members",
+			Method:   "DELETE",
+		},
+	}
 }
-
-const configPath = "config.json"
 
 type NeptuneClient struct {
 	httpClient *http.Client
@@ -27,8 +50,7 @@ type NeptuneClient struct {
 }
 
 func NewNeptuneClient(apiKey string, timeout int64) (*NeptuneClient, error) {
-	timeoutD := time.Duration(timeout)
-	timeoutDuration := timeoutD * time.Second
+	timeoutDuration := time.Duration(timeout) * time.Second
 
 	apiKey, err := getApiToken(apiKey)
 	if err != nil {

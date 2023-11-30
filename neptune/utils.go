@@ -5,16 +5,21 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"net/http"
 	"os"
 )
 
 const neptuneApiToken string = "NEPTUNE_API_TOKEN"
 
-var stringToVisibility = map[string]string {
+var stringToVisibility = map[string]string{
 	"private": "priv",
-	"public": "pub",
+	"public":  "pub",
+}
+
+var roles = map[string]bool{
+	"member":  true,
+	"viewer":  true,
+	"manager": true,
 }
 
 func prepareRequest(host string, endpoint string, method string, params map[string]string, headers map[string]string, body []byte) (*http.Request, error) {
@@ -45,22 +50,6 @@ func prepareRequest(host string, endpoint string, method string, params map[stri
 	req.URL.RawQuery = q.Encode()
 
 	return req, nil
-}
-
-func loadConfig(c interface{}) error {
-	jsonFile, err := os.Open(configPath)
-	if err != nil {
-		return err
-	}
-
-	defer jsonFile.Close()
-
-	byteValue, err := ioutil.ReadAll(jsonFile)
-	if err != nil {
-		return err
-	}
-
-	return json.Unmarshal(byteValue, c)
 }
 
 func decodeAPIToken(apiToken string) (map[string]string, error) {
