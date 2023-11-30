@@ -1,3 +1,4 @@
-## 0.1.0 (Unreleased)
+## [UNRELEASED] terraform-provider-neptune 0.1.0
 
-FEATURES:
+### Features
+- Add `neptune_project_member` resource ([#2](https://github.com/AleksanderWWW/terraform-provider-neptune/pull/2))
