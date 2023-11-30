@@ -12,14 +12,14 @@ import (
 
 const neptuneApiToken string = "NEPTUNE_API_TOKEN"
 
-var stringToVisibility = map[string]string {
+var stringToVisibility = map[string]string{
 	"private": "priv",
-	"public": "pub",
+	"public":  "pub",
 }
 
-var roles = map[string]bool {
-	"member": true,
-	"viewer": true,
+var roles = map[string]bool{
+	"member":  true,
+	"viewer":  true,
 	"manager": true,
 }
 

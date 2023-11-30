@@ -175,17 +175,17 @@ func (c *NeptuneClient) AddProjectMember(project string, workspace string, usern
 		"authorization": fmt.Sprintf("Bearer %s", authToken),
 	}
 
-	params := map[string]string {
+	params := map[string]string{
 		"projectIdentifier": projectIdentifier,
 	}
 
 	type reqBody struct {
-		Role string `json:"role"`
+		Role   string `json:"role"`
 		UserId string `json:"userId"`
 	}
 
 	body := reqBody{
-		Role: role,
+		Role:   role,
 		UserId: username,
 	}
 
@@ -221,7 +221,7 @@ func (c *NeptuneClient) DeleteProjectMember(project string, workspace string, us
 		"authorization": fmt.Sprintf("Bearer %s", authToken),
 	}
 
-	params := map[string]string {
+	params := map[string]string{
 		"projectIdentifier": projectIdentifier,
 	}
 
