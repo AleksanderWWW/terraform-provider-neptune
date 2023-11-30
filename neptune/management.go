@@ -3,6 +3,7 @@ package neptune
 import (
 	"encoding/json"
 	"fmt"
+	"strings"
 )
 
 func (c *NeptuneClient) getAuthToken() (string, error) {
@@ -63,6 +64,18 @@ func (c *NeptuneClient) getWorkspaceId(authToken string, workspaceName string) (
 }
 
 func (c *NeptuneClient) CreateProject(name string, workspace string, key string, vis string) error {
+	if len(name) < 3 {
+		return fmt.Errorf("Project name length should be at least 3 characters. Got %d", len(name))
+	}
+
+	if key == "" {
+		key = strings.ToUpper(name[:3])
+	}
+
+	if vis == "" {
+		vis = "priv"
+	}
+
 	authToken, err := c.getAuthToken()
 	if err != nil {
 		return err

@@ -13,6 +13,4 @@ provider "neptune" {
 resource "neptune_project" "my_project" {
     name = "Terraform"
     workspace = "aleksander.wojnarowicz"
-    key = "TER"
-    vis = "priv"
 }

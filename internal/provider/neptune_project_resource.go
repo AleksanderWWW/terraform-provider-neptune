@@ -74,7 +74,7 @@ func (r *NeptuneProjectResource) Configure(ctx context.Context, req resource.Con
 	if !ok {
 		resp.Diagnostics.AddError(
 			"Unexpected Resource Configure Type",
-			fmt.Sprintf("Expected *http.Client, got: %T. Please report this issue to the provider developers.", req.ProviderData),
+			fmt.Sprintf("Expected *neptune.NeptuneClient, got: %T. Please report this issue to the provider developers.", req.ProviderData),
 		)
 
 		return
@@ -92,7 +92,6 @@ func (r *NeptuneProjectResource) Create(ctx context.Context, req resource.Create
 	if resp.Diagnostics.HasError() {
 		return
 	}
-
 	err := r.client.CreateProject(
 		data.Name.ValueString(),
 		data.Workspace.ValueString(),
