@@ -5,12 +5,13 @@ package provider
 
 import (
 	"context"
+	"terraform-provider-neptune/neptune"
+
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/provider"
 	"github.com/hashicorp/terraform-plugin-framework/provider/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/types"
-	"terraform-provider-neptune/neptune"
 )
 
 // Ensure ScaffoldingProvider satisfies various provider interfaces.
@@ -88,6 +89,7 @@ func (p *NeptuneProvider) Configure(ctx context.Context, req provider.ConfigureR
 func (p *NeptuneProvider) Resources(ctx context.Context) []func() resource.Resource {
 	return []func() resource.Resource{
 		NewNeptuneProjectResource,
+		NewNeptuneProjectMemberResource,
 	}
 }
 
