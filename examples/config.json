@@ -14,5 +14,13 @@
     "deleteProject": {
         "endpoint": "api/backend/v1/projects",
         "method": "DELETE"
+    },
+    "addProjectMember": {
+        "endpoint": "api/backend/v1/projects/members",
+        "method": "POST"
+    },
+    "deleteProjectMember": {
+        "endpoint": "api/backend/v1/projects/members",
+        "method": "DELETE"
     }
 }

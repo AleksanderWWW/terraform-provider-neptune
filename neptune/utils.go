@@ -17,6 +17,12 @@ var stringToVisibility = map[string]string {
 	"public": "pub",
 }
 
+var roles = map[string]bool {
+	"member": true,
+	"viewer": true,
+	"manager": true,
+}
+
 func prepareRequest(host string, endpoint string, method string, params map[string]string, headers map[string]string, body []byte) (*http.Request, error) {
 	baseURL := fmt.Sprintf("%s/%s", host, endpoint)
 	req, err := http.NewRequest(method, baseURL, bytes.NewReader(body))
