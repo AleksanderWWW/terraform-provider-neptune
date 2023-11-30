@@ -53,11 +53,11 @@ func (r *NeptuneProjectResource) Schema(ctx context.Context, req resource.Schema
 				Required:            true,
 			},
 			"key": schema.StringAttribute{
-				MarkdownDescription: "Example configurable attribute",
+				MarkdownDescription: "Project 3-letter key (default: uppercased first 3 letters of the project name)",
 				Optional:            true,
 			},
 			"vis": schema.StringAttribute{
-				MarkdownDescription: "Example configurable attribute",
+				MarkdownDescription: "Project visibility ('private' or 'public', default: 'private')",
 				Optional:            true,
 			},
 		},
