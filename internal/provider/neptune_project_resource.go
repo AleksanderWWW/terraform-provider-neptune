@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 	"strings"
-	"terraform-provider-neptune/neptune"
+	"terraform-provider-neptune/internal/neptune"
 
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"

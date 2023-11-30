@@ -5,7 +5,7 @@ package provider
 
 import (
 	"os"
-	"terraform-provider-neptune/neptune"
+	"terraform-provider-neptune/internal/neptune"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-framework/providerserver"
