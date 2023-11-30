@@ -5,7 +5,7 @@ repos:
     - id: check-merge-conflict
     - id: check-yaml
     - id: end-of-file-fixer
-      exclude: ^vendor/
+      exclude: ^docs/
     - id: trailing-whitespace
       exclude: ^vendor/
 
