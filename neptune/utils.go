@@ -12,6 +12,11 @@ import (
 
 const neptuneApiToken string = "NEPTUNE_API_TOKEN"
 
+var stringToVisibility = map[string]string {
+	"private": "priv",
+	"public": "pub",
+}
+
 func prepareRequest(host string, endpoint string, method string, params map[string]string, headers map[string]string, body []byte) (*http.Request, error) {
 	baseURL := fmt.Sprintf("%s/%s", host, endpoint)
 	req, err := http.NewRequest(method, baseURL, bytes.NewReader(body))
@@ -76,13 +81,10 @@ func decodeAPIToken(apiToken string) (map[string]string, error) {
 }
 
 func getApiToken(apiToken string) (string, error) {
-	var _apiToken string
-	var ok bool
-
 	if apiToken != "" {
 		return apiToken, nil
 	}
-	_apiToken, ok = os.LookupEnv(neptuneApiToken)
+	_apiToken, ok := os.LookupEnv(neptuneApiToken)
 	if !ok {
 		return "", fmt.Errorf("Neptune api token not found")
 	}

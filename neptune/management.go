@@ -73,7 +73,12 @@ func (c *NeptuneClient) CreateProject(name string, workspace string, key string,
 	}
 
 	if vis == "" {
-		vis = "priv"
+		vis = "private"
+	}
+
+	vis, ok := stringToVisibility[strings.ToLower(vis)]
+	if !ok {
+		return fmt.Errorf("Unsupported visibility type '%s'. Available choices (case insensitive) are: 'private', 'public'", vis)
 	}
 
 	authToken, err := c.getAuthToken()
