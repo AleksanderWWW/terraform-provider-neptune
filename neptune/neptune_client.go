@@ -2,6 +2,7 @@ package neptune
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 	"time"
 )
@@ -16,7 +17,10 @@ type operationData struct {
 var config map[operationID]operationData
 
 func init() {
-	loadConfig(&config)
+	err := loadConfig(&config)
+	if err != nil {
+		log.Fatal(err)
+	}
 }
 
 const configPath = "config.json"
@@ -27,8 +31,7 @@ type NeptuneClient struct {
 }
 
 func NewNeptuneClient(apiKey string, timeout int64) (*NeptuneClient, error) {
-	timeoutD := time.Duration(timeout)
-	timeoutDuration := timeoutD * time.Second
+	timeoutDuration := time.Duration(timeout) * time.Second
 
 	apiKey, err := getApiToken(apiKey)
 	if err != nil {
