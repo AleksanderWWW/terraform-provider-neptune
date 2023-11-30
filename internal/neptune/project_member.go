@@ -3,6 +3,8 @@ package neptune
 import (
 	"encoding/json"
 	"fmt"
+
+	"github.com/spf13/viper"
 )
 
 func (c *NeptuneClient) AddProjectMember(project string, workspace string, username string, role string) error {
@@ -84,7 +86,11 @@ func (c *NeptuneClient) DeleteProjectMember(project string, workspace string, us
 		return err
 	}
 
-	opData := config["deleteProjectMember"]
+	var opData operationData
+	err = viper.UnmarshalKey("deleteProjectMember", &opData)
+	if err != nil {
+		return err
+	}
 	endpoint := opData.Endpoint + "/" + username
 
 	req, err := prepareRequest(c.creds.tokenOriginAddress, endpoint, opData.Method, params, headers, bodyJson)
