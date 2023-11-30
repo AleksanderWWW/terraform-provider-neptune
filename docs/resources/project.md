@@ -22,5 +22,5 @@ Neptune project
 
 ### Optional
 
-- `key` (String) Example configurable attribute
-- `vis` (String) Example configurable attribute
+- `key` (String) Project 3-letter key (default: uppercased first 3 letters of the project name)
+- `vis` (String) Project visibility ('private' or 'public', default: 'private')

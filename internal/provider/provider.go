@@ -5,7 +5,7 @@ package provider
 
 import (
 	"context"
-	"terraform-provider-neptune/neptune"
+	"terraform-provider-neptune/internal/neptune"
 
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/provider"
