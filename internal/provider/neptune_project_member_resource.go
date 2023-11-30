@@ -3,6 +3,7 @@ package provider
 import (
 	"context"
 	"fmt"
+	"strings"
 	"terraform-provider-neptune/neptune"
 
 	"github.com/hashicorp/terraform-plugin-framework/path"
@@ -100,11 +101,15 @@ func (r *NeptuneProjectMemberResource) Create(ctx context.Context, req resource.
 	)
 
 	if err != nil {
-		resp.Diagnostics.AddError(
-			"Error creating project",
-			"Could not create project, unexpected error: "+err.Error(),
-		)
-		return
+		if strings.Contains(err.Error(), "already exists") {
+			resp.Diagnostics.AddWarning("Project member already exists", err.Error())
+		} else {
+			resp.Diagnostics.AddError(
+				"Error creating project",
+				"Could not create project, unexpected error: "+err.Error(),
+			)
+			return
+		}
 	}
 
 	// Write logs using the tflog package
@@ -172,11 +177,15 @@ func (r *NeptuneProjectMemberResource) Delete(ctx context.Context, req resource.
 	err := r.client.DeleteProjectMember(data.Project.ValueString(), data.Workspace.ValueString(), data.Username.ValueString())
 
 	if err != nil {
-		resp.Diagnostics.AddError(
-			"Error removing user",
-			"Could not remove user, unexpected error: "+err.Error(),
-		)
-		return
+		if strings.Contains(err.Error(), "not found in project") {
+			resp.Diagnostics.AddWarning("User not found in project", err.Error())
+		} else {
+			resp.Diagnostics.AddError(
+				"Error removing user",
+				"Could not remove user, unexpected error: "+err.Error(),
+			)
+			return
+		}
 	}
 
 	// If applicable, this is a great opportunity to initialize any necessary

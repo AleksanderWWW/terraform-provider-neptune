@@ -9,7 +9,7 @@ import (
 	"os"
 )
 
-const neptuneApiToken string = "NEPTUNE_API_TOKEN"
+const NeptuneApiToken string = "NEPTUNE_API_TOKEN"
 
 var stringToVisibility = map[string]string{
 	"private": "priv",
@@ -73,7 +73,7 @@ func getApiToken(apiToken string) (string, error) {
 	if apiToken != "" {
 		return apiToken, nil
 	}
-	_apiToken, ok := os.LookupEnv(neptuneApiToken)
+	_apiToken, ok := os.LookupEnv(NeptuneApiToken)
 	if !ok {
 		return "", fmt.Errorf("Neptune api token not found")
 	}

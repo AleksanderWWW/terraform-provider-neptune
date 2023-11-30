@@ -81,18 +81,24 @@ func (c *NeptuneClient) DeleteProject(name string, workspace string) error {
 		return err
 	}
 
+	projectIdentifier := fmt.Sprintf("%s/%s", workspace, name)
+
 	headers := map[string]string{
 		"authorization": fmt.Sprintf("Bearer %s", authToken),
 	}
 
 	params := map[string]string{
-		"projectIdentifier": fmt.Sprintf("%s/%s", workspace, name),
+		"projectIdentifier": projectIdentifier,
 	}
 
 	resp, err := c.do("deleteProject", params, headers, nil)
 
 	if err != nil {
 		return err
+	}
+
+	if resp.StatusCode == 404 {
+		return fmt.Errorf("Error: project '%s' does not exist", projectIdentifier)
 	}
 
 	if resp.StatusCode != 200 {

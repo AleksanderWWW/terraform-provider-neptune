@@ -3,6 +3,7 @@ package provider
 import (
 	"context"
 	"fmt"
+	"strings"
 	"terraform-provider-neptune/neptune"
 
 	"github.com/hashicorp/terraform-plugin-framework/path"
@@ -100,16 +101,20 @@ func (r *NeptuneProjectResource) Create(ctx context.Context, req resource.Create
 	)
 
 	if err != nil {
-		resp.Diagnostics.AddError(
-			"Error creating project",
-			"Could not create project, unexpected error: "+err.Error(),
-		)
-		return
+		if strings.Contains(err.Error(), "already exists") {
+			resp.Diagnostics.AddWarning("Project already exists", err.Error())
+		} else {
+			resp.Diagnostics.AddError(
+				"Error creating project",
+				"Could not create project, unexpected error: "+err.Error(),
+			)
+			return
+		}
 	}
 
 	// Write logs using the tflog package
 	// Documentation: https://terraform.io/plugin/log
-	tflog.Trace(ctx, "created project")
+	tflog.Trace(ctx, fmt.Sprintf("Project %s/%s created", data.Workspace.ValueString(), data.Name.ValueString()))
 
 	// Save data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -172,11 +177,15 @@ func (r *NeptuneProjectResource) Delete(ctx context.Context, req resource.Delete
 	err := r.client.DeleteProject(data.Name.ValueString(), data.Workspace.ValueString())
 
 	if err != nil {
-		resp.Diagnostics.AddError(
-			"Error deleting project",
-			"Could not delete project, unexpected error: "+err.Error(),
-		)
-		return
+		if strings.Contains(err.Error(), "does not exist") {
+			resp.Diagnostics.AddWarning("Project does not exist", err.Error())
+		} else {
+			resp.Diagnostics.AddError(
+				"Error deleting project",
+				"Could not delete project, unexpected error: "+err.Error(),
+			)
+			return
+		}
 	}
 
 	// If applicable, this is a great opportunity to initialize any necessary
