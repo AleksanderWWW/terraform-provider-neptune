@@ -7,7 +7,7 @@ repos:
     - id: end-of-file-fixer
       exclude: ^docs/
     - id: trailing-whitespace
-      exclude: ^vendor/
+      exclude: ^docs/
 
 - repo: https://github.com/dnephin/pre-commit-golang
   rev: v0.5.1
