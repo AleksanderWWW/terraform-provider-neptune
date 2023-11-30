@@ -2,7 +2,6 @@ package neptune
 
 import (
 	"fmt"
-	"log"
 	"net/http"
 	"time"
 )
@@ -17,9 +16,31 @@ type operationData struct {
 var config map[operationID]operationData
 
 func init() {
-	err := loadConfig(&config)
-	if err != nil {
-		log.Fatal(err)
+	config = map[operationID]operationData{
+		"auth": {
+			Endpoint: "api/backend/v1/authorization/oauth-token",
+			Method:   "GET",
+		},
+		"createProject": {
+			Endpoint: "api/backend/v1/projects",
+			Method:   "POST",
+		},
+		"listOrganizations": {
+			Endpoint: "api/backend/v1/myOrganizations",
+			Method:   "GET",
+		},
+		"deleteProject": {
+			Endpoint: "api/backend/v1/projects",
+			Method:   "DELETE",
+		},
+		"addProjectMember": {
+			Endpoint: "api/backend/v1/projects/members",
+			Method:   "POST",
+		},
+		"deleteProjectMember": {
+			Endpoint: "api/backend/v1/projects/members",
+			Method:   "DELETE",
+		},
 	}
 }
 
