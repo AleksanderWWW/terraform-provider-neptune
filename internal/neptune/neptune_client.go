@@ -22,7 +22,11 @@ func init() {
 	viper.AddConfigPath("../..")
 	err := viper.ReadInConfig()
 	if err != nil {
-		panic(err)
+		if _, ok := err.(viper.ConfigFileNotFoundError); ok {
+			// Config file not found; ignore error if desired
+		} else {
+			panic(err)
+		}
 	}
 }
 
