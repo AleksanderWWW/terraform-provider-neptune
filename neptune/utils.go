@@ -5,7 +5,6 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
-	"io"
 	"net/http"
 	"os"
 )
@@ -51,22 +50,6 @@ func prepareRequest(host string, endpoint string, method string, params map[stri
 	req.URL.RawQuery = q.Encode()
 
 	return req, nil
-}
-
-func loadConfig(c interface{}) error {
-	jsonFile, err := os.Open(configPath)
-	if err != nil {
-		return err
-	}
-
-	defer jsonFile.Close()
-
-	byteValue, err := io.ReadAll(jsonFile)
-	if err != nil {
-		return err
-	}
-
-	return json.Unmarshal(byteValue, c)
 }
 
 func decodeAPIToken(apiToken string) (map[string]string, error) {

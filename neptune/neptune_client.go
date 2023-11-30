@@ -44,8 +44,6 @@ func init() {
 	}
 }
 
-const configPath = "config.json"
-
 type NeptuneClient struct {
 	httpClient *http.Client
 	creds      credentials
