@@ -1,46 +1,28 @@
 package neptune
 
 import (
-	"fmt"
 	"net/http"
 	"time"
+
+	"github.com/spf13/viper"
 )
 
 type operationID string
 
 type operationData struct {
-	Endpoint string `json:"endpoint"`
-	Method   string `json:"method"`
+	Endpoint string `mapstructure:"endpoint"`
+	Method   string `mapstructure:"method"`
 }
 
-var config map[operationID]operationData
-
 func init() {
-	config = map[operationID]operationData{
-		"auth": {
-			Endpoint: "api/backend/v1/authorization/oauth-token",
-			Method:   "GET",
-		},
-		"createProject": {
-			Endpoint: "api/backend/v1/projects",
-			Method:   "POST",
-		},
-		"listOrganizations": {
-			Endpoint: "api/backend/v1/myOrganizations",
-			Method:   "GET",
-		},
-		"deleteProject": {
-			Endpoint: "api/backend/v1/projects",
-			Method:   "DELETE",
-		},
-		"addProjectMember": {
-			Endpoint: "api/backend/v1/projects/members",
-			Method:   "POST",
-		},
-		"deleteProjectMember": {
-			Endpoint: "api/backend/v1/projects/members",
-			Method:   "DELETE",
-		},
+	viper.SetConfigName("config")
+	viper.SetConfigType("json")
+	viper.AddConfigPath(".")
+	viper.AddConfigPath("..")
+	viper.AddConfigPath("../..")
+	err := viper.ReadInConfig()
+	if err != nil {
+		panic(err)
 	}
 }
 
@@ -71,9 +53,10 @@ func NewNeptuneClient(apiKey string, timeout int64) (*NeptuneClient, error) {
 }
 
 func (c *NeptuneClient) do(id operationID, params map[string]string, headers map[string]string, body []byte) (*http.Response, error) {
-	opData, ok := config[id]
-	if !ok {
-		return nil, fmt.Errorf("Invalid operation '%s'", id)
+	var opData operationData
+	err := viper.UnmarshalKey(string(id), &opData)
+	if err != nil {
+		return nil, err
 	}
 
 	req, err := prepareRequest(c.creds.tokenOriginAddress, opData.Endpoint, opData.Method, params, headers, body)
