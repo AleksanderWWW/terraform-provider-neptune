@@ -105,8 +105,8 @@ func (r *NeptuneProjectMemberResource) Create(ctx context.Context, req resource.
 			resp.Diagnostics.AddWarning("Project member already exists", err.Error())
 		} else {
 			resp.Diagnostics.AddError(
-				"Error creating project",
-				"Could not create project, unexpected error: "+err.Error(),
+				"Error adding project member",
+				"Could not add project member, unexpected error: "+err.Error(),
 			)
 			return
 		}

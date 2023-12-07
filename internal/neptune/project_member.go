@@ -104,7 +104,7 @@ func (c *NeptuneClient) DeleteProjectMember(project string, workspace string, us
 		return err
 	}
 
-	if resp.StatusCode == 422 {
+	if resp.StatusCode == 404 {
 		return fmt.Errorf("User '%s' not found in project '%s", username, projectIdentifier)
 	}
 
