@@ -117,9 +117,9 @@ func (c *NeptuneClient) DeleteProjectMember(project string, workspace string, us
 func (c *NeptuneClient) UpdateProjectMember(project string, workspace string, username string, role string) error {
 	role = strings.ToLower(role)
 	if _, ok := map[string]bool{
-		"viewer": true,
-		"member": true,
-		"owner":  true,
+		"viewer":  true,
+		"member":  true,
+		"manager": true,
 	}[role]; !ok {
 		return fmt.Errorf("Unexpected 'role' argument value: '%s'", role)
 	}

@@ -18,14 +18,14 @@ func TestAccNeptuneProjectMemberResource(t *testing.T) {
 			{
 				Config: providerConfig + `
 				resource "neptune_project_member" "test_member" {
-					project   = "e2e-20231130-0854-mouth-southern-trip"
+					project   = "e2e-20231207-0911-television-analysis"
 					workspace = "e2e-tests"
 					username  = "e2e.regularuser"
 					role      = "member"
 				  }
 				`,
 				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttr("neptune_project_member.test_member", "project", "e2e-20231130-0854-mouth-southern-trip"),
+					resource.TestCheckResourceAttr("neptune_project_member.test_member", "project", "e2e-20231207-0911-television-analysis"),
 					resource.TestCheckResourceAttr("neptune_project_member.test_member", "workspace", "e2e-tests"),
 					resource.TestCheckResourceAttr("neptune_project_member.test_member", "username", "e2e.regularuser"),
 					resource.TestCheckResourceAttr("neptune_project_member.test_member", "role", "member"),
@@ -41,6 +41,23 @@ func TestAccNeptuneProjectMemberResource(t *testing.T) {
 			// 	// Once the Read method is able to refresh information from
 			// 	// the upstream service, this can be removed.
 			// },
+			// Update testing
+			{
+				Config: providerConfig + `
+				resource "neptune_project_member" "test_member" {
+					project   = "e2e-20231207-0911-television-analysis"
+					workspace = "e2e-tests"
+					username  = "e2e.regularuser"
+					role      = "viewer"
+				  }
+				`,
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckResourceAttr("neptune_project_member.test_member", "project", "e2e-20231207-0911-television-analysis"),
+					resource.TestCheckResourceAttr("neptune_project_member.test_member", "workspace", "e2e-tests"),
+					resource.TestCheckResourceAttr("neptune_project_member.test_member", "username", "e2e.regularuser"),
+					resource.TestCheckResourceAttr("neptune_project_member.test_member", "role", "viewer"),
+				),
+			},
 			// Update and Read testing (not applicable)
 			// {
 			// 	Config: testAccExampleResourceConfig("two"),
