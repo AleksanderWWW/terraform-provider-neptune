@@ -22,5 +22,9 @@
     "deleteProjectMember": {
         "endpoint": "api/backend/v1/projects/members",
         "method": "DELETE"
+    },
+    "updateProjectMember": {
+        "endpoint": "api/backend/v1/projects/members",
+        "method": "PATCH"
     }
 }
