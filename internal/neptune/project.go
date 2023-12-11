@@ -49,7 +49,11 @@ func (c *NeptuneClient) CreateProject(name string, workspace string, key string,
 	}
 
 	if resp.StatusCode == 422 {
-		return nil
+		return fmt.Errorf("Error: project limit exceeded")
+	}
+
+	if resp.StatusCode == 409 {
+		return fmt.Errorf("Error: project '%s/%s' already exists", workspace, name)
 	}
 
 	if resp.StatusCode != 200 {
