@@ -5,18 +5,18 @@ import (
 	"net/http"
 )
 
-// MockReadCloser is a mock implementation of io.ReadCloser
+// MockReadCloser is a mock implementation of io.ReadCloser.
 type MockReadCloser struct {
 	data  string
 	index int
 }
 
-// NewMockReadCloser creates a new instance of MockReadCloser
+// NewMockReadCloser creates a new instance of MockReadCloser.
 func NewMockReadCloser(data string) *MockReadCloser {
 	return &MockReadCloser{data: data}
 }
 
-// Read implements the io.Reader interface
+// Read implements the io.Reader interface.
 func (m *MockReadCloser) Read(p []byte) (n int, err error) {
 	if m.index >= len(m.data) {
 		return 0, io.EOF
@@ -27,7 +27,7 @@ func (m *MockReadCloser) Read(p []byte) (n int, err error) {
 	return n, nil
 }
 
-// Close implements the io.Closer interface
+// Close implements the io.Closer interface.
 func (m *MockReadCloser) Close() error {
 	return nil
 }
