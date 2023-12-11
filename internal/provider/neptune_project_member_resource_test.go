@@ -18,7 +18,7 @@ func TestAccNeptuneProjectMemberResource(t *testing.T) {
 			{
 				Config: providerConfig + `
 				resource "neptune_project_member" "test_member" {
-					project   = "e2e-20231207-0911-television-analysis"
+					project   = "e2e-20231211-0809-southern-dog-cover"
 					workspace = "e2e-tests"
 					username  = "e2e.regularuser"
 					role      = "member"
