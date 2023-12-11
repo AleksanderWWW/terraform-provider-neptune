@@ -16,7 +16,7 @@ resource "neptune_project" "my_project" {
 }
 
 resource "neptune_project_member" "my_project_member" {
-  project   = "e2e-20231130-0854-mouth-southern-trip"
+  project   = "e2e-20231207-0911-television-analysis"
   workspace = "e2e-tests"
   username  = "e2e.regularuser"
   role      = "member"

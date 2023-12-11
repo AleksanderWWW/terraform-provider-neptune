@@ -105,8 +105,8 @@ func (r *NeptuneProjectMemberResource) Create(ctx context.Context, req resource.
 			resp.Diagnostics.AddWarning("Project member already exists", err.Error())
 		} else {
 			resp.Diagnostics.AddError(
-				"Error creating project",
-				"Could not create project, unexpected error: "+err.Error(),
+				"Error adding project member",
+				"Could not add project member, unexpected error: "+err.Error(),
 			)
 			return
 		}
@@ -152,6 +152,23 @@ func (r *NeptuneProjectMemberResource) Update(ctx context.Context, req resource.
 		return
 	}
 
+	if err := r.client.UpdateProjectMember(
+		data.Project.ValueString(),
+		data.Workspace.ValueString(),
+		data.Username.ValueString(),
+		data.Role.ValueString(),
+	); err != nil {
+		if strings.Contains(err.Error(), "not found") {
+			resp.Diagnostics.AddWarning("User or project not found", err.Error())
+		} else {
+			resp.Diagnostics.AddError(
+				"Error updating project member",
+				"Could not update project member, unexpected error: "+err.Error(),
+			)
+			return
+		}
+	}
+
 	// If applicable, this is a great opportunity to initialize any necessary
 	// provider client data and make a call using it.
 	// httpResp, err := r.client.Do(httpReq)
@@ -178,11 +195,11 @@ func (r *NeptuneProjectMemberResource) Delete(ctx context.Context, req resource.
 
 	if err != nil {
 		if strings.Contains(err.Error(), "not found in project") {
-			resp.Diagnostics.AddWarning("User not found in project", err.Error())
+			resp.Diagnostics.AddWarning("Project member not found", err.Error())
 		} else {
 			resp.Diagnostics.AddError(
-				"Error removing user",
-				"Could not remove user, unexpected error: "+err.Error(),
+				"Error removing project member",
+				"Could not remove project member, unexpected error: "+err.Error(),
 			)
 			return
 		}

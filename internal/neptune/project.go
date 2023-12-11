@@ -19,9 +19,9 @@ func (c *NeptuneClient) CreateProject(name string, workspace string, key string,
 		vis = "private"
 	}
 
-	vis, ok := stringToVisibility[strings.ToLower(vis)]
+	_vis, ok := stringToVisibility[strings.ToLower(vis)]
 	if !ok {
-		return fmt.Errorf("Unsupported visibility type '%s'. Available choices (case insensitive) are: 'private', 'public'", vis)
+		return fmt.Errorf("Unsupported visibility type '%s'. Available choices (case insensitive) are: 'private', 'public' and 'workspace'", vis)
 	}
 
 	authToken, err := c.getAuthToken()
@@ -37,7 +37,7 @@ func (c *NeptuneClient) CreateProject(name string, workspace string, key string,
 	if err != nil {
 		return err
 	}
-	body, err := formProjectBody(name, workspaceId, vis, key)
+	body, err := formProjectBody(name, workspaceId, _vis, key)
 	if err != nil {
 		return err
 	}
@@ -49,7 +49,11 @@ func (c *NeptuneClient) CreateProject(name string, workspace string, key string,
 	}
 
 	if resp.StatusCode == 422 {
-		return fmt.Errorf("Error: project '%s' already exists", name)
+		return fmt.Errorf("Error: project limit exceeded")
+	}
+
+	if resp.StatusCode == 409 {
+		return fmt.Errorf("Error: project '%s/%s' already exists", workspace, name)
 	}
 
 	if resp.StatusCode != 200 {
