@@ -6,13 +6,23 @@ import (
 	"strings"
 )
 
-func (c *NeptuneClient) CreateProject(name string, workspace string, key string, vis string) error {
+type projectData struct {
+	projectIdentifier string
+	key               string
+	vis               string
+}
+
+func verifyCreateProjectArgs(name string, workspace string, key string, vis string) (projectData, error) {
 	if len(name) < 3 {
-		return fmt.Errorf("Project name length should be at least 3 characters. Got %d", len(name))
+		return projectData{}, fmt.Errorf("Project name length should be at least 3 characters. Got %d", len(name))
 	}
 
 	if key == "" {
 		key = strings.ToUpper(name[:3])
+	}
+
+	if len(key) != 3 {
+		return projectData{}, fmt.Errorf("Key must either be an empty, or a 3-letter string. Got '%s'", key)
 	}
 
 	if vis == "" {
@@ -21,7 +31,23 @@ func (c *NeptuneClient) CreateProject(name string, workspace string, key string,
 
 	_vis, ok := stringToVisibility[strings.ToLower(vis)]
 	if !ok {
-		return fmt.Errorf("Unsupported visibility type '%s'. Available choices (case insensitive) are: 'private', 'public' and 'workspace'", vis)
+		return projectData{}, fmt.Errorf(
+			"Unsupported visibility type '%s'. Available choices (case insensitive) are: 'private', 'public' and 'workspace'",
+			vis,
+		)
+	}
+
+	return projectData{
+		projectIdentifier: fmt.Sprintf("%s/%s", workspace, name),
+		key:               key,
+		vis:               _vis,
+	}, nil
+}
+
+func (c *NeptuneClient) CreateProject(name string, workspace string, key string, vis string) error {
+	project, err := verifyCreateProjectArgs(name, workspace, key, vis)
+	if err != nil {
+		return err
 	}
 
 	authToken, err := c.getAuthToken()
@@ -37,7 +63,7 @@ func (c *NeptuneClient) CreateProject(name string, workspace string, key string,
 	if err != nil {
 		return err
 	}
-	body, err := formProjectBody(name, workspaceId, _vis, key)
+	body, err := formProjectBody(name, workspaceId, project.vis, key)
 	if err != nil {
 		return err
 	}
@@ -53,7 +79,7 @@ func (c *NeptuneClient) CreateProject(name string, workspace string, key string,
 	}
 
 	if resp.StatusCode == 409 {
-		return fmt.Errorf("Error: project '%s/%s' already exists", workspace, name)
+		return fmt.Errorf("Error: project '%s' already exists", project.projectIdentifier)
 	}
 
 	if resp.StatusCode != 200 {
