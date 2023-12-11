@@ -63,11 +63,12 @@ func (c *NeptuneClient) CreateProject(name string, workspace string, key string,
 	if err != nil {
 		return err
 	}
-	body, err := formProjectBody(name, workspaceId, project.vis, key)
+	body, err := formProjectBody(name, workspaceId, project.vis, project.key)
 	if err != nil {
 		return err
 	}
 
+	fmt.Print(string(body[:]))
 	resp, err := c.do("createProject", nil, headers, body)
 
 	if err != nil {
