@@ -48,6 +48,10 @@ func (c *NeptuneClient) CreateProject(name string, workspace string, key string,
 		return err
 	}
 
+	if resp.StatusCode == 422 {
+		return nil
+	}
+
 	if resp.StatusCode != 200 {
 		return fmt.Errorf("Error: response status code %d", resp.StatusCode)
 	}
