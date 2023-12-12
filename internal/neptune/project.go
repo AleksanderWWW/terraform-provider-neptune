@@ -68,7 +68,6 @@ func (c *NeptuneClient) CreateProject(name string, workspace string, key string,
 		return err
 	}
 
-	fmt.Print(string(body[:]))
 	resp, err := c.do("createProject", nil, headers, body)
 
 	if err != nil {

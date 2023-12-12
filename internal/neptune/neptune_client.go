@@ -7,7 +7,7 @@ import (
 	"github.com/spf13/viper"
 )
 
-type httpClient interface {
+type httpClientType interface {
 	Do(*http.Request) (*http.Response, error)
 }
 
@@ -35,7 +35,7 @@ func init() {
 }
 
 type NeptuneClient struct {
-	httpClient httpClient
+	httpClient httpClientType
 	creds      credentials
 }
 

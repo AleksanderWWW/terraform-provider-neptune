@@ -28,14 +28,14 @@ func TestFormProjectBody(t *testing.T) {
 
 	for _, test := range []testCase{
 		{
-			projectBody{
+			pb: projectBody{
 				"Name1",
 				"SomeID1",
 				"priv",
 				"NAM",
 			},
-			"{\"name\":\"Name1\",\"organizationId\":\"SomeID1\",\"visibility\":\"priv\",\"projectKey\":\"NAM\"}",
-			false,
+			expectedOut:  "{\"name\":\"Name1\",\"organizationId\":\"SomeID1\",\"visibility\":\"priv\",\"projectKey\":\"NAM\"}",
+			expectingErr: false,
 		},
 		{
 			pb:           projectBody{},

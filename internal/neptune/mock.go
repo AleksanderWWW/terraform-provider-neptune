@@ -1,6 +1,7 @@
 package neptune
 
 import (
+	"fmt"
 	"io"
 	"net/http"
 )
@@ -40,9 +41,23 @@ type MockHttpClient struct {
 }
 
 func (mhc *MockHttpClient) Do(req *http.Request) (*http.Response, error) {
+	var resp *http.Response
+	var err error
+
 	mhc.reqSent = req
-	resp := mhc.resps[mhc.index]
-	err := mhc.errs[mhc.index]
+
+	if mhc.index >= len(mhc.resps) {
+		resp = &http.Response{}
+	} else {
+		resp = mhc.resps[mhc.index]
+	}
+
+	if mhc.index >= len(mhc.errs) {
+		err = fmt.Errorf("Too few errors provided for mock http client")
+	} else {
+		err = mhc.errs[mhc.index]
+	}
+
 	mhc.index++
 	return resp, err
 }
