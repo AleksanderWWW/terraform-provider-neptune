@@ -65,6 +65,9 @@ func (c *NeptuneClient) CreateProject(name string, workspace string, key string,
 	}
 
 	resp, err := c.do("createProject", nil, headers, body)
+	if err != nil {
+		return err
+	}
 	responseString, _ := getResponseMessage(resp)
 
 	if resp.StatusCode != 200 {
