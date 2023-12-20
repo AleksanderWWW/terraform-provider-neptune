@@ -194,7 +194,7 @@ func (r *NeptuneProjectMemberResource) Delete(ctx context.Context, req resource.
 	err := r.client.DeleteProjectMember(data.Project.ValueString(), data.Workspace.ValueString(), data.Username.ValueString())
 
 	if err != nil {
-		if strings.Contains(err.Error(), "not found in project") {
+		if strings.Contains(err.Error(), "USER_NOT_IN_PROJECT") {
 			resp.Diagnostics.AddWarning("Project member not found", err.Error())
 		} else {
 			resp.Diagnostics.AddError(
