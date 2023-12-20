@@ -5,6 +5,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"os"
 )
@@ -78,4 +79,21 @@ func getApiToken(apiToken string) (string, error) {
 		return "", fmt.Errorf("Neptune api token not found")
 	}
 	return _apiToken, nil
+}
+
+func getResponseMessage(resp *http.Response) (string, error) {
+	defer resp.Body.Close()
+
+	responseData, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return "", err
+	}
+
+	responseString := string(responseData)
+
+	if err != nil {
+		return "", err
+	}
+
+	return fmt.Sprintf("%d: %s", resp.StatusCode, responseString), nil
 }

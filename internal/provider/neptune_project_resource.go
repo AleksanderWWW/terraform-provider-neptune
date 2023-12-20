@@ -101,7 +101,7 @@ func (r *NeptuneProjectResource) Create(ctx context.Context, req resource.Create
 	)
 
 	if err != nil {
-		if strings.Contains(err.Error(), "already exists") {
+		if strings.Contains(err.Error(), "PROJECT_NAME_COLLISION") {
 			resp.Diagnostics.AddWarning("Project already exists", err.Error())
 		} else {
 			resp.Diagnostics.AddError(

@@ -104,12 +104,10 @@ func (c *NeptuneClient) DeleteProjectMember(project string, workspace string, us
 		return err
 	}
 
-	if resp.StatusCode == 404 {
-		return fmt.Errorf("User '%s' not found in project '%s", username, projectIdentifier)
-	}
+	responseString, _ := getResponseMessage(resp)
 
 	if resp.StatusCode != 200 {
-		return fmt.Errorf("Error: response status code %d", resp.StatusCode)
+		return fmt.Errorf(responseString)
 	}
 	return nil
 }
@@ -169,16 +167,10 @@ func (c *NeptuneClient) UpdateProjectMember(project string, workspace string, us
 		return err
 	}
 
-	if resp.StatusCode == 404 {
-		return fmt.Errorf("Project '%s' not found", projectIdentifier)
-	}
-
-	if resp.StatusCode == 400 {
-		return fmt.Errorf("User '%s' not found", username)
-	}
+	responseString, _ := getResponseMessage(resp)
 
 	if resp.StatusCode != 200 {
-		return fmt.Errorf("Error: response status code %d", resp.StatusCode)
+		return fmt.Errorf(responseString)
 	}
 
 	return nil

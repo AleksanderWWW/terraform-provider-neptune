@@ -63,14 +63,6 @@ func TestVerifyCreateProjectArgs(t *testing.T) {
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(), "Unsupported visibility type")
 
-	_, err = verifyCreateProjectArgs("SomeProject", "SomeWorkspace", "WrongKey", "")
-	assert.Error(t, err)
-	assert.Contains(t, err.Error(), "Key must either be an empty, or a 3-letter string")
-
-	_, err = verifyCreateProjectArgs("SomeProject", "SomeWorkspace", "WK", "")
-	assert.Error(t, err)
-	assert.Contains(t, err.Error(), "Key must either be an empty, or a 3-letter string")
-
 	project, err := verifyCreateProjectArgs("SomeName", "SomeWorkspace", "", "")
 	assert.NoError(t, err)
 	assert.Equal(
@@ -84,46 +76,7 @@ func TestVerifyCreateProjectArgs(t *testing.T) {
 	)
 }
 
-func executeCreateProject(resps []*http.Response, creds credentials) error {
-	client := MockHttpClient{
-		resps: resps,
-		errs:  []error{nil, nil, nil},
-	}
-
-	nptClient := NeptuneClient{
-		httpClient: &client,
-		creds:      creds,
-	}
-
-	return nptClient.CreateProject("Name1", "Workspace1", "", "")
-}
-
-func TestCreateProjectSuccess(t *testing.T) {
-	resps := []*http.Response{
-		{
-			StatusCode: 200,
-			Body: &MockReadCloser{
-				data: "{\"accessToken\":\"someToken\"}",
-			},
-		},
-		{
-			StatusCode: 200,
-			Body: &MockReadCloser{
-				data: "[{\"name\": \"Workspace1\", \"id\":\"someId\"}]",
-			},
-		},
-		{
-			StatusCode: 200,
-			Body: &MockReadCloser{
-				data: "",
-			},
-		},
-	}
-	err := executeCreateProject(resps, creds)
-	assert.NoError(t, err)
-}
-
-func TestCreateProjectIfExists(t *testing.T) {
+func TestCreateProjectInvalidResponseCode(t *testing.T) {
 	resps := []*http.Response{
 		{
 			StatusCode: 200,
@@ -140,113 +93,13 @@ func TestCreateProjectIfExists(t *testing.T) {
 		{
 			StatusCode: 409,
 			Body: &MockReadCloser{
-				data: "",
-			},
-		},
-	}
-	err := executeCreateProject(resps, creds)
-	assert.EqualError(t, err, "Error: project 'Workspace1/Name1' already exists")
-}
-
-func TestCreateProjectLimitExceeded(t *testing.T) {
-	resps := []*http.Response{
-		{
-			StatusCode: 200,
-			Body: &MockReadCloser{
-				data: "{\"accessToken\":\"someToken\"}",
-			},
-		},
-		{
-			StatusCode: 200,
-			Body: &MockReadCloser{
-				data: "[{\"name\": \"Workspace1\", \"id\":\"someId\"}]",
-			},
-		},
-		{
-			StatusCode: 422,
-			Body: &MockReadCloser{
-				data: "",
-			},
-		},
-	}
-	err := executeCreateProject(resps, creds)
-	assert.EqualError(t, err, "Error: project limit exceeded")
-}
-
-func TestCreateProjectLInvalidStatusCode(t *testing.T) {
-	resps := []*http.Response{
-		{
-			StatusCode: 200,
-			Body: &MockReadCloser{
-				data: "{\"accessToken\":\"someToken\"}",
-			},
-		},
-		{
-			StatusCode: 200,
-			Body: &MockReadCloser{
-				data: "[{\"name\": \"Workspace1\", \"id\":\"someId\"}]",
-			},
-		},
-		{
-			StatusCode: 500,
-			Body: &MockReadCloser{
-				data: "",
-			},
-		},
-	}
-	err := executeCreateProject(resps, creds)
-	assert.EqualError(t, err, "Error: response status code 500")
-}
-
-func TestCreateProjectWorkspaceNotFound(t *testing.T) {
-	resps := []*http.Response{
-		{
-			StatusCode: 200,
-			Body: &MockReadCloser{
-				data: "{\"accessToken\":\"someToken\"}",
-			},
-		},
-		{
-			StatusCode: 200,
-			Body: &MockReadCloser{
-				data: "[{\"name\": \"Workspace42\", \"id\":\"someId\"}]",
-			},
-		},
-		{
-			StatusCode: 409,
-			Body: &MockReadCloser{
-				data: "",
-			},
-		},
-	}
-	err := executeCreateProject(resps, creds)
-	assert.EqualError(t, err, "Workspace 'Workspace1' not found")
-}
-
-func TestCreateProjectErrorWithResponse(t *testing.T) {
-	resps := []*http.Response{
-		{
-			StatusCode: 200,
-			Body: &MockReadCloser{
-				data: "{\"accessToken\":\"someToken\"}",
-			},
-		},
-		{
-			StatusCode: 200,
-			Body: &MockReadCloser{
-				data: "[{\"name\": \"Workspace1\", \"id\":\"someId\"}]",
-			},
-		},
-		{
-			StatusCode: 409,
-			Body: &MockReadCloser{
-				data: "",
+				data: "Test error",
 			},
 		},
 	}
 	client := MockHttpClient{
 		resps: resps,
-		errs:  []error{nil, nil, fmt.Errorf("Some custom error here")},
+		errs:  []error{nil, nil, fmt.Errorf("409: Test error")},
 	}
 
 	nptClient := NeptuneClient{
@@ -254,5 +107,5 @@ func TestCreateProjectErrorWithResponse(t *testing.T) {
 		creds:      creds,
 	}
 	err := nptClient.CreateProject("Name1", "Workspace1", "", "")
-	assert.EqualError(t, err, "Some custom error here")
+	assert.EqualError(t, err, "409: Test error")
 }

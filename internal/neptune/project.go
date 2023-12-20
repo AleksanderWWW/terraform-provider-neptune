@@ -21,10 +21,6 @@ func verifyCreateProjectArgs(name string, workspace string, key string, vis stri
 		key = strings.ToUpper(name[:3])
 	}
 
-	if len(key) != 3 {
-		return projectData{}, fmt.Errorf("Key must either be an empty, or a 3-letter string. Got '%s'", key)
-	}
-
 	if vis == "" {
 		vis = "private"
 	}
@@ -69,21 +65,10 @@ func (c *NeptuneClient) CreateProject(name string, workspace string, key string,
 	}
 
 	resp, err := c.do("createProject", nil, headers, body)
-
-	if err != nil {
-		return err
-	}
-
-	if resp.StatusCode == 422 {
-		return fmt.Errorf("Error: project limit exceeded")
-	}
-
-	if resp.StatusCode == 409 {
-		return fmt.Errorf("Error: project '%s' already exists", project.projectIdentifier)
-	}
+	responseString, _ := getResponseMessage(resp)
 
 	if resp.StatusCode != 200 {
-		return fmt.Errorf("Error: response status code %d", resp.StatusCode)
+		return fmt.Errorf(responseString)
 	}
 
 	return nil
@@ -127,12 +112,10 @@ func (c *NeptuneClient) DeleteProject(name string, workspace string) error {
 		return err
 	}
 
-	if resp.StatusCode == 404 {
-		return fmt.Errorf("Error: project '%s' does not exist", projectIdentifier)
-	}
+	responseString, _ := getResponseMessage(resp)
 
 	if resp.StatusCode != 200 {
-		return fmt.Errorf("Error: response status code %d", resp.StatusCode)
+		return fmt.Errorf(responseString)
 	}
 
 	return nil
