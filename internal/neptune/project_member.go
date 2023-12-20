@@ -8,7 +8,7 @@ import (
 	"github.com/spf13/viper"
 )
 
-func (c *NeptuneClient) AddProjectMember(project string, workspace string, username string, role string) error {
+func (c *NeptuneClient) AddProjectMember(project, workspace, username, role string) error {
 	if _, ok := roles[role]; !ok {
 		return fmt.Errorf("Unknown role '%s'", role)
 	}
@@ -48,13 +48,11 @@ func (c *NeptuneClient) AddProjectMember(project string, workspace string, usern
 		return err
 	}
 
-	if resp.StatusCode == 409 {
-		return fmt.Errorf("User '%s' already exists in project '%s", username, projectIdentifier)
+	if resp.StatusCode != 200 {
+		responseString, _ := getResponseMessage(resp)
+		return fmt.Errorf(responseString)
 	}
 
-	if resp.StatusCode != 200 {
-		return fmt.Errorf("Error: response status code %d", resp.StatusCode)
-	}
 	return nil
 }
 
@@ -104,13 +102,11 @@ func (c *NeptuneClient) DeleteProjectMember(project string, workspace string, us
 		return err
 	}
 
-	if resp.StatusCode == 404 {
-		return fmt.Errorf("User '%s' not found in project '%s", username, projectIdentifier)
+	if resp.StatusCode != 200 {
+		responseString, _ := getResponseMessage(resp)
+		return fmt.Errorf(responseString)
 	}
 
-	if resp.StatusCode != 200 {
-		return fmt.Errorf("Error: response status code %d", resp.StatusCode)
-	}
 	return nil
 }
 
@@ -169,16 +165,9 @@ func (c *NeptuneClient) UpdateProjectMember(project string, workspace string, us
 		return err
 	}
 
-	if resp.StatusCode == 404 {
-		return fmt.Errorf("Project '%s' not found", projectIdentifier)
-	}
-
-	if resp.StatusCode == 400 {
-		return fmt.Errorf("User '%s' not found", username)
-	}
-
 	if resp.StatusCode != 200 {
-		return fmt.Errorf("Error: response status code %d", resp.StatusCode)
+		responseString, _ := getResponseMessage(resp)
+		return fmt.Errorf(responseString)
 	}
 
 	return nil

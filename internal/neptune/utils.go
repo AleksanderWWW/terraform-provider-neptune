@@ -5,6 +5,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 	"os"
 )
@@ -78,4 +79,17 @@ func getApiToken(apiToken string) (string, error) {
 		return "", fmt.Errorf("Neptune api token not found")
 	}
 	return _apiToken, nil
+}
+
+func getResponseMessage(resp *http.Response) (string, error) {
+	defer resp.Body.Close()
+
+	responseData, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return "", err
+	}
+
+	responseString := string(responseData)
+
+	return fmt.Sprintf("%d: %s", resp.StatusCode, responseString), nil
 }

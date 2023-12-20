@@ -7,6 +7,10 @@ import (
 	"github.com/spf13/viper"
 )
 
+type httpClientType interface {
+	Do(*http.Request) (*http.Response, error)
+}
+
 type operationID string
 
 type operationData struct {
@@ -31,7 +35,7 @@ func init() {
 }
 
 type NeptuneClient struct {
-	httpClient *http.Client
+	httpClient httpClientType
 	creds      credentials
 }
 

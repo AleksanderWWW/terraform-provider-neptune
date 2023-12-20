@@ -11,13 +11,14 @@ provider "neptune" {
 }
 
 resource "neptune_project" "my_project" {
-  name      = "Terraform"
-  workspace = "aleksander.wojnarowicz"
+  name      = "Terraform-project"
+  workspace = "e2e-tests"
+  key       = "TEST"
 }
 
 resource "neptune_project_member" "my_project_member" {
-  project   = "e2e-20231207-0911-television-analysis"
+  project   = "Terraform-user"
   workspace = "e2e-tests"
   username  = "e2e.regularuser"
-  role      = "member"
+  role      = "viewer"
 }

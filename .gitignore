@@ -37,3 +37,6 @@ website/vendor
 # Coverage reporting
 cover.html
 cover.out
+
+# code snippets
+snippet*
