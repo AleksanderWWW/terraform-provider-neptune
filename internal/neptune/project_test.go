@@ -1,7 +1,6 @@
 package neptune
 
 import (
-	"fmt"
 	"net/http"
 	"testing"
 
@@ -99,7 +98,7 @@ func TestCreateProjectInvalidResponseCode(t *testing.T) {
 	}
 	client := MockHttpClient{
 		resps: resps,
-		errs:  []error{nil, nil, fmt.Errorf("409: Test error")},
+		errs:  []error{nil, nil, nil},
 	}
 
 	nptClient := NeptuneClient{
@@ -108,4 +107,60 @@ func TestCreateProjectInvalidResponseCode(t *testing.T) {
 	}
 	err := nptClient.CreateProject("Name1", "Workspace1", "", "")
 	assert.EqualError(t, err, "409: Test error")
+}
+
+func TestDeleteProjectSuccess(t *testing.T) {
+	resps := []*http.Response{
+		{
+			StatusCode: 200,
+			Body: &MockReadCloser{
+				data: "{\"accessToken\":\"someToken\"}",
+			},
+		},
+		{
+			StatusCode: 200,
+			Body: &MockReadCloser{
+				data: "",
+			},
+		},
+	}
+	client := MockHttpClient{
+		resps: resps,
+		errs:  []error{nil, nil, nil},
+	}
+
+	nptClient := NeptuneClient{
+		httpClient: &client,
+		creds:      creds,
+	}
+	err := nptClient.DeleteProject("Name1", "Workspace1")
+	assert.NoError(t, err)
+}
+
+func TestDeleteProjectError(t *testing.T) {
+	resps := []*http.Response{
+		{
+			StatusCode: 200,
+			Body: &MockReadCloser{
+				data: "{\"accessToken\":\"someToken\"}",
+			},
+		},
+		{
+			StatusCode: 404,
+			Body: &MockReadCloser{
+				data: "Test error",
+			},
+		},
+	}
+	client := MockHttpClient{
+		resps: resps,
+		errs:  []error{nil, nil, nil},
+	}
+
+	nptClient := NeptuneClient{
+		httpClient: &client,
+		creds:      creds,
+	}
+	err := nptClient.DeleteProject("Name1", "Workspace1")
+	assert.EqualError(t, err, "404: Test error")
 }
