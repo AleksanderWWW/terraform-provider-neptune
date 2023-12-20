@@ -101,7 +101,7 @@ func (r *NeptuneProjectMemberResource) Create(ctx context.Context, req resource.
 	)
 
 	if err != nil {
-		if strings.Contains(err.Error(), "already exists") {
+		if strings.Contains(err.Error(), "User already has permissions to the project") {
 			resp.Diagnostics.AddWarning("Project member already exists", err.Error())
 		} else {
 			resp.Diagnostics.AddError(
