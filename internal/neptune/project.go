@@ -68,9 +68,9 @@ func (c *NeptuneClient) CreateProject(name string, workspace string, key string,
 	if err != nil {
 		return err
 	}
-	responseString, _ := getResponseMessage(resp)
 
 	if resp.StatusCode != 200 {
+		responseString, _ := getResponseMessage(resp)
 		return fmt.Errorf(responseString)
 	}
 
@@ -115,9 +115,8 @@ func (c *NeptuneClient) DeleteProject(name string, workspace string) error {
 		return err
 	}
 
-	responseString, _ := getResponseMessage(resp)
-
 	if resp.StatusCode != 200 {
+		responseString, _ := getResponseMessage(resp)
 		return fmt.Errorf(responseString)
 	}
 

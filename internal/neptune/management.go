@@ -21,6 +21,11 @@ func (c *NeptuneClient) getAuthToken() (string, error) {
 	}
 	defer resp.Body.Close()
 
+	if resp.StatusCode != 200 {
+		responseString, _ := getResponseMessage(resp)
+		return "", fmt.Errorf(responseString)
+	}
+
 	err = json.NewDecoder(resp.Body).Decode(&respJson)
 	if err != nil {
 		return "", err

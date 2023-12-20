@@ -7,7 +7,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-var creds credentials = credentials{
+var testCreds credentials = credentials{
 	apiToken:           "someAPIToken",
 	tokenOriginAddress: "someAddress",
 }
@@ -103,10 +103,44 @@ func TestCreateProjectInvalidResponseCode(t *testing.T) {
 
 	nptClient := NeptuneClient{
 		httpClient: &client,
-		creds:      creds,
+		creds:      testCreds,
 	}
 	err := nptClient.CreateProject("Name1", "Workspace1", "", "")
 	assert.EqualError(t, err, "409: Test error")
+}
+
+func TestCreateProjectSuccess(t *testing.T) {
+	resps := []*http.Response{
+		{
+			StatusCode: 200,
+			Body: &MockReadCloser{
+				data: "{\"accessToken\":\"someToken\"}",
+			},
+		},
+		{
+			StatusCode: 200,
+			Body: &MockReadCloser{
+				data: "[{\"name\": \"Workspace1\", \"id\":\"someId\"}]",
+			},
+		},
+		{
+			StatusCode: 200,
+			Body: &MockReadCloser{
+				data: "",
+			},
+		},
+	}
+	client := MockHttpClient{
+		resps: resps,
+		errs:  []error{nil, nil, nil},
+	}
+
+	nptClient := NeptuneClient{
+		httpClient: &client,
+		creds:      testCreds,
+	}
+	err := nptClient.CreateProject("Name1", "Workspace1", "", "")
+	assert.NoError(t, err)
 }
 
 func TestDeleteProjectSuccess(t *testing.T) {
@@ -131,7 +165,7 @@ func TestDeleteProjectSuccess(t *testing.T) {
 
 	nptClient := NeptuneClient{
 		httpClient: &client,
-		creds:      creds,
+		creds:      testCreds,
 	}
 	err := nptClient.DeleteProject("Name1", "Workspace1")
 	assert.NoError(t, err)
@@ -159,8 +193,72 @@ func TestDeleteProjectError(t *testing.T) {
 
 	nptClient := NeptuneClient{
 		httpClient: &client,
-		creds:      creds,
+		creds:      testCreds,
 	}
 	err := nptClient.DeleteProject("Name1", "Workspace1")
 	assert.EqualError(t, err, "404: Test error")
+}
+
+func TestCreateProjectTokenError(t *testing.T) {
+
+	resps := []*http.Response{
+		{
+			StatusCode: 500,
+			Body: &MockReadCloser{
+				data: "Test error",
+			},
+		},
+		{
+			StatusCode: 200,
+			Body: &MockReadCloser{
+				data: "[{\"name\": \"Workspace1\", \"id\":\"someId\"}]",
+			},
+		},
+		{
+			StatusCode: 200,
+			Body: &MockReadCloser{
+				data: "",
+			},
+		},
+	}
+	client := MockHttpClient{
+		resps: resps,
+		errs:  []error{nil, nil, nil},
+	}
+
+	nptClient := NeptuneClient{
+		httpClient: &client,
+		creds:      testCreds,
+	}
+	err := nptClient.CreateProject("Name1", "Workspace1", "", "")
+	assert.EqualError(t, err, "500: Test error")
+}
+
+func TestDeleteProjectTokenError(t *testing.T) {
+
+	resps := []*http.Response{
+		{
+			StatusCode: 500,
+			Body: &MockReadCloser{
+				data: "Test error",
+			},
+		},
+		{
+			StatusCode: 200,
+			Body: &MockReadCloser{
+				data: "",
+			},
+		},
+	}
+	client := MockHttpClient{
+		resps: resps,
+		errs:  []error{nil, nil, nil},
+	}
+
+	nptClient := NeptuneClient{
+		httpClient: &client,
+		creds:      testCreds,
+	}
+	err := nptClient.DeleteProject("Name1", "Workspace1")
+	assert.EqualError(t, err, "500: Test error")
 }

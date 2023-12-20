@@ -91,9 +91,5 @@ func getResponseMessage(resp *http.Response) (string, error) {
 
 	responseString := string(responseData)
 
-	if err != nil {
-		return "", err
-	}
-
 	return fmt.Sprintf("%d: %s", resp.StatusCode, responseString), nil
 }
