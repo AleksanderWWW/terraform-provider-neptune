@@ -6,9 +6,15 @@ import (
 	"strings"
 )
 
-func (c *NeptuneClient) CreateProject(name string, workspace string, key string, vis string) error {
+type projectData struct {
+	projectIdentifier string
+	key               string
+	vis               string
+}
+
+func verifyCreateProjectArgs(name string, workspace string, key string, vis string) (projectData, error) {
 	if len(name) < 3 {
-		return fmt.Errorf("Project name length should be at least 3 characters. Got %d", len(name))
+		return projectData{}, fmt.Errorf("Project name length should be at least 3 characters. Got %d", len(name))
 	}
 
 	if key == "" {
@@ -21,7 +27,23 @@ func (c *NeptuneClient) CreateProject(name string, workspace string, key string,
 
 	_vis, ok := stringToVisibility[strings.ToLower(vis)]
 	if !ok {
-		return fmt.Errorf("Unsupported visibility type '%s'. Available choices (case insensitive) are: 'private', 'public' and 'workspace'", vis)
+		return projectData{}, fmt.Errorf(
+			"Unsupported visibility type '%s'. Available choices (case insensitive) are: 'private', 'public' and 'workspace'",
+			vis,
+		)
+	}
+
+	return projectData{
+		projectIdentifier: fmt.Sprintf("%s/%s", workspace, name),
+		key:               key,
+		vis:               _vis,
+	}, nil
+}
+
+func (c *NeptuneClient) CreateProject(name string, workspace string, key string, vis string) error {
+	project, err := verifyCreateProjectArgs(name, workspace, key, vis)
+	if err != nil {
+		return err
 	}
 
 	authToken, err := c.getAuthToken()
@@ -37,27 +59,19 @@ func (c *NeptuneClient) CreateProject(name string, workspace string, key string,
 	if err != nil {
 		return err
 	}
-	body, err := formProjectBody(name, workspaceId, _vis, key)
+	body, err := formProjectBody(name, workspaceId, project.vis, project.key)
 	if err != nil {
 		return err
 	}
 
 	resp, err := c.do("createProject", nil, headers, body)
-
 	if err != nil {
 		return err
 	}
 
-	if resp.StatusCode == 422 {
-		return fmt.Errorf("Error: project limit exceeded")
-	}
-
-	if resp.StatusCode == 409 {
-		return fmt.Errorf("Error: project '%s/%s' already exists", workspace, name)
-	}
-
 	if resp.StatusCode != 200 {
-		return fmt.Errorf("Error: response status code %d", resp.StatusCode)
+		responseString, _ := getResponseMessage(resp)
+		return fmt.Errorf(responseString)
 	}
 
 	return nil
@@ -101,12 +115,9 @@ func (c *NeptuneClient) DeleteProject(name string, workspace string) error {
 		return err
 	}
 
-	if resp.StatusCode == 404 {
-		return fmt.Errorf("Error: project '%s' does not exist", projectIdentifier)
-	}
-
 	if resp.StatusCode != 200 {
-		return fmt.Errorf("Error: response status code %d", resp.StatusCode)
+		responseString, _ := getResponseMessage(resp)
+		return fmt.Errorf(responseString)
 	}
 
 	return nil

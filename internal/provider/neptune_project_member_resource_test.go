@@ -18,14 +18,14 @@ func TestAccNeptuneProjectMemberResource(t *testing.T) {
 			{
 				Config: providerConfig + `
 				resource "neptune_project_member" "test_member" {
-					project   = "e2e-20231211-0809-southern-dog-cover"
+					project   = "Terraform-user"
 					workspace = "e2e-tests"
 					username  = "e2e.regularuser"
 					role      = "member"
 				  }
 				`,
 				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttr("neptune_project_member.test_member", "project", "e2e-20231211-0809-southern-dog-cover"),
+					resource.TestCheckResourceAttr("neptune_project_member.test_member", "project", "Terraform-user"),
 					resource.TestCheckResourceAttr("neptune_project_member.test_member", "workspace", "e2e-tests"),
 					resource.TestCheckResourceAttr("neptune_project_member.test_member", "username", "e2e.regularuser"),
 					resource.TestCheckResourceAttr("neptune_project_member.test_member", "role", "member"),
@@ -45,14 +45,14 @@ func TestAccNeptuneProjectMemberResource(t *testing.T) {
 			{
 				Config: providerConfig + `
 				resource "neptune_project_member" "test_member" {
-					project   = "e2e-20231211-0809-southern-dog-cover"
+					project   = "Terraform-user"
 					workspace = "e2e-tests"
 					username  = "e2e.regularuser"
 					role      = "viewer"
 				  }
 				`,
 				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttr("neptune_project_member.test_member", "project", "e2e-20231211-0809-southern-dog-cover"),
+					resource.TestCheckResourceAttr("neptune_project_member.test_member", "project", "Terraform-user"),
 					resource.TestCheckResourceAttr("neptune_project_member.test_member", "workspace", "e2e-tests"),
 					resource.TestCheckResourceAttr("neptune_project_member.test_member", "username", "e2e.regularuser"),
 					resource.TestCheckResourceAttr("neptune_project_member.test_member", "role", "viewer"),
