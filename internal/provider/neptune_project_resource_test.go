@@ -19,13 +19,13 @@ func TestAccNeptuneProjectResource(t *testing.T) {
 				Config: providerConfig + `
 				resource "neptune_project" "test" {
 					name      = "Terraform-project"
-					workspace = "e2e-tests"
+					workspace = "e2e"
 					key 	  = "TEST"
 				}
 				`,
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("neptune_project.test", "name", "Terraform-project"),
-					resource.TestCheckResourceAttr("neptune_project.test", "workspace", "e2e-tests"),
+					resource.TestCheckResourceAttr("neptune_project.test", "workspace", "e2e"),
 				),
 			},
 			// ImportState testing (not applicable)
