@@ -8,6 +8,7 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"strings"
 )
 
 const NeptuneApiToken string = "NEPTUNE_API_TOKEN"
@@ -92,4 +93,19 @@ func getResponseMessage(resp *http.Response) (string, error) {
 	responseString := string(responseData)
 
 	return fmt.Sprintf("%d: %s", resp.StatusCode, responseString), nil
+}
+
+func shouldAllowSelfSignedCertificates() bool {
+	envVal, ok := os.LookupEnv("NEPTUNE_ALLOW_SELF_SIGNED_CERTIFICATE")
+	if !ok || len(envVal) == 0 {
+		return false
+	}
+
+	envVal = string(strings.ToLower(envVal)[0])
+
+	if envVal == "t" || envVal == "1" {
+		return true
+	}
+
+	return false
 }

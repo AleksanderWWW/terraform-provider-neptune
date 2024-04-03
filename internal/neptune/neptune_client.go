@@ -54,7 +54,7 @@ func NewNeptuneClient(apiKey string, timeout int64) (*NeptuneClient, error) {
 	}
 
 	tr := &http.Transport{
-		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+		TLSClientConfig: &tls.Config{InsecureSkipVerify: shouldAllowSelfSignedCertificates()},
 	}
 
 	return &NeptuneClient{
