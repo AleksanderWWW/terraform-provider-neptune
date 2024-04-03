@@ -4,27 +4,30 @@
 package provider
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
 )
 
 func TestAccNeptuneProjectResource(t *testing.T) {
+	projectName := "Terraform-" + fake.Hash().MD5()
+
 	resource.Test(t, resource.TestCase{
 		PreCheck:                 func() { testAccPreCheck(t) },
 		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
 		Steps: []resource.TestStep{
 			// Create and Read testing
 			{
-				Config: providerConfig + `
+				Config: providerConfig + fmt.Sprintf(`
 				resource "neptune_project" "test" {
-					name      = "Terraform-project"
+					name      = "%s"
 					workspace = "e2e"
 					key 	  = "TEST"
 				}
-				`,
+				`, projectName),
 				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttr("neptune_project.test", "name", "Terraform-project"),
+					resource.TestCheckResourceAttr("neptune_project.test", "name", projectName),
 					resource.TestCheckResourceAttr("neptune_project.test", "workspace", "e2e"),
 				),
 			},
