@@ -29,11 +29,19 @@ func TestShouldAllowSelfSignedCertificateEnvSet(t *testing.T) {
 			true,
 		},
 		{
+			"1",
+			true,
+		},
+		{
 			"False",
 			false,
 		},
 		{
 			"",
+			false,
+		},
+		{
+			"0",
 			false,
 		},
 	}
