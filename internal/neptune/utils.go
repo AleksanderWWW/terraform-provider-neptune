@@ -106,9 +106,5 @@ func shouldAllowSelfSignedCertificates() bool {
 
 	envVal = string(strings.ToLower(envVal)[0])
 
-	if envVal == "t" || envVal == "1" {
-		return true
-	}
-
-	return false
+	return (envVal == "t" || envVal == "1")
 }
