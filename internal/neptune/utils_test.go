@@ -8,7 +8,7 @@ import (
 )
 
 func TestShouldAllowSelfSignedCertificateEnvSet(t *testing.T) {
-	defer os.Unsetenv(NeptuneAllowSelfSignedCcertificate)
+	defer os.Unsetenv(NeptuneAllowSelfSignedCertificate)
 
 	type testCase struct {
 		envVal string
@@ -47,12 +47,12 @@ func TestShouldAllowSelfSignedCertificateEnvSet(t *testing.T) {
 	}
 
 	for _, tc := range testCases {
-		os.Setenv(NeptuneAllowSelfSignedCcertificate, tc.envVal)
+		os.Setenv(NeptuneAllowSelfSignedCertificate, tc.envVal)
 		assert.Equal(t, shouldAllowSelfSignedCertificates(), tc.result)
 	}
 }
 
 func TestShouldAllowSelfSignedCertificateEnvNotSet(t *testing.T) {
-	os.Unsetenv(NeptuneAllowSelfSignedCcertificate)
+	os.Unsetenv(NeptuneAllowSelfSignedCertificate)
 	assert.Equal(t, shouldAllowSelfSignedCertificates(), false)
 }
