@@ -5,7 +5,6 @@ package provider
 
 import (
 	"fmt"
-	"strings"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
@@ -13,7 +12,6 @@ import (
 
 func TestAccNeptuneProjectMemberResource(t *testing.T) {
 	projectName := "Terraform-" + fake.Hash().MD5()
-	key := strings.ToUpper(fake.Lorem().Text(10))
 
 	resource.Test(t, resource.TestCase{
 		PreCheck:                 func() { testAccPreCheck(t) },
@@ -25,7 +23,6 @@ func TestAccNeptuneProjectMemberResource(t *testing.T) {
 				resource "neptune_project" "test" {
 					name      = "%s"
 					workspace = "e2e-tests"
-					key 	  = "%s"
 				}
 
 				resource "neptune_project_member" "test_member" {
@@ -35,7 +32,7 @@ func TestAccNeptuneProjectMemberResource(t *testing.T) {
 					username  = "e2e.regularuser"
 					role      = "member"
 				  }
-				`, projectName, key),
+				`, projectName),
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("neptune_project_member.test_member", "project", "Terraform-user"),
 					resource.TestCheckResourceAttr("neptune_project_member.test_member", "workspace", "e2e-tests"),
