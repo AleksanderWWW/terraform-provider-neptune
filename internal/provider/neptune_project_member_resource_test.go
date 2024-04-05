@@ -4,6 +4,7 @@
 package provider
 
 import (
+	"fmt"
 	"strings"
 	"testing"
 
@@ -20,7 +21,7 @@ func TestAccNeptuneProjectMemberResource(t *testing.T) {
 		Steps: []resource.TestStep{
 			// Create and Read testing
 			{
-				Config: providerConfig + `
+				Config: providerConfig + fmt.Sprintf(`
 				resource "neptune_project" "test" {
 					name      = "%s"
 					workspace = "e2e-tests"
@@ -34,7 +35,7 @@ func TestAccNeptuneProjectMemberResource(t *testing.T) {
 					username  = "e2e.regularuser"
 					role      = "member"
 				  }
-				`,
+				`, projectName, key),
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("neptune_project_member.test_member", "project", "Terraform-user"),
 					resource.TestCheckResourceAttr("neptune_project_member.test_member", "workspace", "e2e-tests"),
