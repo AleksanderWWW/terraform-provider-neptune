@@ -13,7 +13,7 @@ import (
 
 func TestAccNeptuneProjectMemberResource(t *testing.T) {
 	projectName := "Terraform-" + fake.Hash().MD5()
-	key := strings.ToUpper(fake.Lorem().Text(3))
+	key := strings.ToUpper(fake.Lorem().Text(10))
 
 	resource.Test(t, resource.TestCase{
 		PreCheck:                 func() { testAccPreCheck(t) },
