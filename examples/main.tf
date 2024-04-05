@@ -13,7 +13,6 @@ provider "neptune" {
 resource "neptune_project" "my_project" {
   name      = "Terraform-project"
   workspace = "e2e-tests"
-  key       = "TEST"
 }
 
 resource "neptune_project_member" "my_project_member" {
