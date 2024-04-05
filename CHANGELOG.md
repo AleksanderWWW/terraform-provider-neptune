@@ -8,3 +8,6 @@
 ### Changes
 - If resources in Neptune.ai already exist (when creating) or do not exist (when deleting) - only warn ([#3](https://github.com/AleksanderWWW/terraform-provider-neptune/pull/3))
 - Read config with Viper ([#5](https://github.com/AleksanderWWW/terraform-provider-neptune/pull/5))
+
+### Fixes
+- Misc fixes to the tests and CI ([#24](https://github.com/AleksanderWWW/terraform-provider-neptune/pull/24))
