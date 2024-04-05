@@ -1,6 +1,7 @@
 package neptune
 
 import (
+	"crypto/tls"
 	"net/http"
 	"time"
 
@@ -52,9 +53,14 @@ func NewNeptuneClient(apiKey string, timeout int64) (*NeptuneClient, error) {
 		return nil, err
 	}
 
+	tr := &http.Transport{
+		TLSClientConfig: &tls.Config{InsecureSkipVerify: shouldAllowSelfSignedCertificates()},
+	}
+
 	return &NeptuneClient{
 		httpClient: &http.Client{
-			Timeout: timeoutDuration,
+			Timeout:   timeoutDuration,
+			Transport: tr,
 		},
 		creds: *credentials,
 	}, nil
