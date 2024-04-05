@@ -5,6 +5,7 @@ package provider
 
 import (
 	"fmt"
+	"strings"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
@@ -12,6 +13,7 @@ import (
 
 func TestAccNeptuneProjectResource(t *testing.T) {
 	projectName := "Terraform-" + fake.Hash().MD5()
+	key := strings.ToUpper(fake.Lorem().Text(3))
 
 	resource.Test(t, resource.TestCase{
 		PreCheck:                 func() { testAccPreCheck(t) },
@@ -22,13 +24,13 @@ func TestAccNeptuneProjectResource(t *testing.T) {
 				Config: providerConfig + fmt.Sprintf(`
 				resource "neptune_project" "test" {
 					name      = "%s"
-					workspace = "e2e"
-					key 	  = "TEST"
+					workspace = "e2e-tests"
+					key 	  = "%s"
 				}
-				`, projectName),
+				`, projectName, key),
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("neptune_project.test", "name", projectName),
-					resource.TestCheckResourceAttr("neptune_project.test", "workspace", "e2e"),
+					resource.TestCheckResourceAttr("neptune_project.test", "workspace", "e2e-tests"),
 				),
 			},
 			// ImportState testing (not applicable)

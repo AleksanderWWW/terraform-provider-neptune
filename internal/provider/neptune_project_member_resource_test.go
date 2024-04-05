@@ -19,15 +19,15 @@ func TestAccNeptuneProjectMemberResource(t *testing.T) {
 				Config: providerConfig + `
 				resource "neptune_project_member" "test_member" {
 					project   = "Terraform-user"
-					workspace = "e2e"
-					username  = "team-member"
+					workspace = "e2e-tests"
+					username  = "e2e.regularuser"
 					role      = "member"
 				  }
 				`,
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("neptune_project_member.test_member", "project", "Terraform-user"),
-					resource.TestCheckResourceAttr("neptune_project_member.test_member", "workspace", "e2e"),
-					resource.TestCheckResourceAttr("neptune_project_member.test_member", "username", "team-member"),
+					resource.TestCheckResourceAttr("neptune_project_member.test_member", "workspace", "e2e-tests"),
+					resource.TestCheckResourceAttr("neptune_project_member.test_member", "username", "e2e.regularuser"),
 					resource.TestCheckResourceAttr("neptune_project_member.test_member", "role", "member"),
 				),
 			},
@@ -46,15 +46,15 @@ func TestAccNeptuneProjectMemberResource(t *testing.T) {
 				Config: providerConfig + `
 				resource "neptune_project_member" "test_member" {
 					project   = "Terraform-user"
-					workspace = "e2e"
-					username  = "team-member"
+					workspace = "e2e-tests"
+					username  = "e2e.regularuser"
 					role      = "viewer"
 				  }
 				`,
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("neptune_project_member.test_member", "project", "Terraform-user"),
-					resource.TestCheckResourceAttr("neptune_project_member.test_member", "workspace", "e2e"),
-					resource.TestCheckResourceAttr("neptune_project_member.test_member", "username", "team-member"),
+					resource.TestCheckResourceAttr("neptune_project_member.test_member", "workspace", "e2e-tests"),
+					resource.TestCheckResourceAttr("neptune_project_member.test_member", "username", "e2e.regularuser"),
 					resource.TestCheckResourceAttr("neptune_project_member.test_member", "role", "viewer"),
 				),
 			},
