@@ -4,28 +4,37 @@
 package provider
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
 )
 
 func TestAccNeptuneProjectMemberResource(t *testing.T) {
+	projectName := "Terraform-" + fake.Hash().MD5()
+
 	resource.Test(t, resource.TestCase{
 		PreCheck:                 func() { testAccPreCheck(t) },
 		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
 		Steps: []resource.TestStep{
 			// Create and Read testing
 			{
-				Config: providerConfig + `
+				Config: providerConfig + fmt.Sprintf(`
+				resource "neptune_project" "test" {
+					name      = "%s"
+					workspace = "e2e-tests"
+				}
+
 				resource "neptune_project_member" "test_member" {
-					project   = "Terraform-user"
+					depends_on = [neptune_project.test]
+					project   = "%s"
 					workspace = "e2e-tests"
 					username  = "e2e.regularuser"
 					role      = "member"
 				  }
-				`,
+				`, projectName, projectName),
 				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttr("neptune_project_member.test_member", "project", "Terraform-user"),
+					resource.TestCheckResourceAttr("neptune_project_member.test_member", "project", projectName),
 					resource.TestCheckResourceAttr("neptune_project_member.test_member", "workspace", "e2e-tests"),
 					resource.TestCheckResourceAttr("neptune_project_member.test_member", "username", "e2e.regularuser"),
 					resource.TestCheckResourceAttr("neptune_project_member.test_member", "role", "member"),
@@ -43,16 +52,16 @@ func TestAccNeptuneProjectMemberResource(t *testing.T) {
 			// },
 			// Update testing
 			{
-				Config: providerConfig + `
+				Config: providerConfig + fmt.Sprintf(`
 				resource "neptune_project_member" "test_member" {
-					project   = "Terraform-user"
+					project   = "%s"
 					workspace = "e2e-tests"
 					username  = "e2e.regularuser"
 					role      = "viewer"
 				  }
-				`,
+				`, projectName),
 				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttr("neptune_project_member.test_member", "project", "Terraform-user"),
+					resource.TestCheckResourceAttr("neptune_project_member.test_member", "project", projectName),
 					resource.TestCheckResourceAttr("neptune_project_member.test_member", "workspace", "e2e-tests"),
 					resource.TestCheckResourceAttr("neptune_project_member.test_member", "username", "e2e.regularuser"),
 					resource.TestCheckResourceAttr("neptune_project_member.test_member", "role", "viewer"),

@@ -42,7 +42,7 @@ func TestFormProjectBody(t *testing.T) {
 			expectingErr: false,
 		},
 	} {
-		body, err := formProjectBody(test.pb.name, test.pb.workspaceId, test.pb.visibility, test.pb.projectKey)
+		body, err := formProjectBody(test.pb.name, test.pb.workspaceId, test.pb.visibility, &test.pb.projectKey)
 		if test.expectingErr {
 			assert.Error(t, err)
 		} else {
@@ -69,7 +69,7 @@ func TestVerifyCreateProjectArgs(t *testing.T) {
 		project,
 		projectData{
 			"SomeWorkspace/SomeName",
-			"SOM",
+			nil,
 			"priv",
 		},
 	)

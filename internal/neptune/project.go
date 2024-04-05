@@ -8,7 +8,7 @@ import (
 
 type projectData struct {
 	projectIdentifier string
-	key               string
+	key               *string
 	vis               string
 }
 
@@ -17,8 +17,12 @@ func verifyCreateProjectArgs(name string, workspace string, key string, vis stri
 		return projectData{}, fmt.Errorf("Project name length should be at least 3 characters. Got %d", len(name))
 	}
 
+	var optionalKey *string
+
 	if key == "" {
-		key = strings.ToUpper(name[:3])
+		optionalKey = nil
+	} else {
+		optionalKey = &key
 	}
 
 	if vis == "" {
@@ -35,7 +39,7 @@ func verifyCreateProjectArgs(name string, workspace string, key string, vis stri
 
 	return projectData{
 		projectIdentifier: fmt.Sprintf("%s/%s", workspace, name),
-		key:               key,
+		key:               optionalKey,
 		vis:               _vis,
 	}, nil
 }
@@ -77,12 +81,12 @@ func (c *NeptuneClient) CreateProject(name string, workspace string, key string,
 	return nil
 }
 
-func formProjectBody(name string, workspaceId string, vis string, key string) ([]byte, error) {
+func formProjectBody(name string, workspaceId string, vis string, key *string) ([]byte, error) {
 	type body struct {
-		Name           string `json:"name"`
-		OrganizationId string `json:"organizationId"`
-		Visibility     string `json:"visibility"`
-		ProjectKey     string `json:"projectKey"`
+		Name           string  `json:"name"`
+		OrganizationId string  `json:"organizationId"`
+		Visibility     string  `json:"visibility"`
+		ProjectKey     *string `json:"projectKey"`
 	}
 	b := body{
 		Name:           name,
