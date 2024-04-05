@@ -196,6 +196,8 @@ func (r *NeptuneProjectMemberResource) Delete(ctx context.Context, req resource.
 	if err != nil {
 		if strings.Contains(err.Error(), "USER_NOT_IN_PROJECT") {
 			resp.Diagnostics.AddWarning("Project member not found", err.Error())
+		} else if strings.Contains(err.Error(), "404") {
+			return
 		} else {
 			resp.Diagnostics.AddError(
 				"Error removing project member",

@@ -17,6 +17,7 @@ resource "neptune_project" "my_project" {
 }
 
 resource "neptune_project_member" "my_project_member" {
+  depends_on = [neptune_project.my_project]
   project   = "Terraform-project"
   workspace = "e2e-tests"
   username  = "e2e.regularuser"

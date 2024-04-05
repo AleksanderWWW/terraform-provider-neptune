@@ -4,12 +4,16 @@
 package provider
 
 import (
+	"strings"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
 )
 
 func TestAccNeptuneProjectMemberResource(t *testing.T) {
+	projectName := "Terraform-" + fake.Hash().MD5()
+	key := strings.ToUpper(fake.Lorem().Text(3))
+
 	resource.Test(t, resource.TestCase{
 		PreCheck:                 func() { testAccPreCheck(t) },
 		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
@@ -17,7 +21,14 @@ func TestAccNeptuneProjectMemberResource(t *testing.T) {
 			// Create and Read testing
 			{
 				Config: providerConfig + `
+				resource "neptune_project" "test" {
+					name      = "%s"
+					workspace = "e2e-tests"
+					key 	  = "%s"
+				}
+
 				resource "neptune_project_member" "test_member" {
+					depends_on = [neptune_project.test]
 					project   = "Terraform-user"
 					workspace = "e2e-tests"
 					username  = "e2e.regularuser"
