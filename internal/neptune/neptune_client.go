@@ -66,14 +66,14 @@ func NewNeptuneClient(apiKey string, timeout int64) (*NeptuneClient, error) {
 	}, nil
 }
 
-func (c *NeptuneClient) do(id operationID, params map[string]string, headers map[string]string, body []byte) (*http.Response, error) {
+func (c *NeptuneClient) do(id operationID, data *requestData) (*http.Response, error) {
 	var opData operationData
 	err := viper.UnmarshalKey(string(id), &opData)
 	if err != nil {
 		return nil, err
 	}
 
-	req, err := prepareRequest(c.creds.tokenOriginAddress, opData.Endpoint, opData.Method, params, headers, body)
+	req, err := prepareRequest(c.creds.tokenOriginAddress, opData.Endpoint, opData.Method, data)
 	if err != nil {
 		return nil, err
 	}

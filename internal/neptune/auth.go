@@ -21,7 +21,7 @@ func NewCredentials(apiToken string) (*credentials, error) {
 
 	tokenOriginAddress, ok := tokenDict["api_address"]
 	if !ok {
-		return nil, fmt.Errorf("Invalid api token")
+		return nil, fmt.Errorf("invalid api token")
 	}
 
 	return &credentials{

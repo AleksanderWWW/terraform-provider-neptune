@@ -3,23 +3,24 @@ package neptune
 import (
 	"encoding/json"
 	"fmt"
-	"strings"
 
 	"github.com/spf13/viper"
 )
 
-func (c *NeptuneClient) AddProjectMember(project, workspace, username, role string) error {
-	if _, ok := roles[role]; !ok {
-		return fmt.Errorf("Unknown role '%s'", role)
-	}
+type addProjectMemberRequestBody struct {
+	Role   string `json:"role"`
+	UserId string `json:"userId"`
+}
 
-	authToken, err := c.getAuthToken()
-	if err != nil {
-		return err
-	}
+type deleteProjectMemberRequestBody struct {
+	UserId string `json:"userId"`
+}
 
-	projectIdentifier := fmt.Sprintf("%s/%s", workspace, project)
+type updateProjectMemberRequestBody struct {
+	Role string `json:"role"`
+}
 
+func buildAddProjectMemberRequestData(authToken, projectIdentifier, username, role string) (*requestData, error) {
 	headers := map[string]string{
 		"authorization": fmt.Sprintf("Bearer %s", authToken),
 	}
@@ -28,32 +29,89 @@ func (c *NeptuneClient) AddProjectMember(project, workspace, username, role stri
 		"projectIdentifier": projectIdentifier,
 	}
 
-	type reqBody struct {
-		Role   string `json:"role"`
-		UserId string `json:"userId"`
-	}
-
-	body := reqBody{
+	body := addProjectMemberRequestBody{
 		Role:   role,
 		UserId: username,
 	}
 
 	bodyJson, err := json.Marshal(body)
 	if err != nil {
-		return err
+		return &requestData{}, err
 	}
 
-	resp, err := c.do("addProjectMember", params, headers, bodyJson)
+	return newRequestData(headers, params, bodyJson), nil
+}
+
+func buildDeleteProjectMemberRequestData(authToken, projectIdentifier, username string) (*requestData, error) {
+	headers := map[string]string{
+		"authorization": fmt.Sprintf("Bearer %s", authToken),
+	}
+
+	params := map[string]string{
+		"projectIdentifier": projectIdentifier,
+	}
+
+	body := deleteProjectMemberRequestBody{
+		UserId: username,
+	}
+
+	bodyJson, err := json.Marshal(body)
+	if err != nil {
+		return &requestData{}, err
+	}
+
+	return newRequestData(headers, params, bodyJson), nil
+}
+
+func buildUpdateProjectMemberRequestData(authToken, projectIdentifier, username, role string) (*requestData, error) {
+	headers := map[string]string{
+		"authorization": fmt.Sprintf("Bearer %s", authToken),
+	}
+
+	params := map[string]string{
+		"projectIdentifier": projectIdentifier,
+	}
+
+	body := updateProjectMemberRequestBody{
+		Role: role,
+	}
+
+	bodyJson, err := json.Marshal(body)
+	if err != nil {
+		return &requestData{}, err
+	}
+
+	return newRequestData(headers, params, bodyJson), nil
+}
+
+func (c *NeptuneClient) AddProjectMember(project, workspace, username, role string) error {
+	if _, ok := roles[role]; !ok {
+		return fmt.Errorf("unknown role '%s'", role)
+	}
+
+	authToken, err := c.getAuthToken()
 	if err != nil {
 		return err
 	}
 
-	if resp.StatusCode != 200 {
-		responseString, _ := getResponseMessage(resp)
-		return fmt.Errorf(responseString)
+	projectIdentifier := buildProjectIdentifier(workspace, project)
+
+	data, err := buildAddProjectMemberRequestData(authToken, projectIdentifier, username, role)
+
+	if err != nil {
+		return err
 	}
 
-	return nil
+	resp, err := c.do("addProjectMember", data)
+	if err != nil {
+		return err
+	}
+
+	if resp.StatusCode == 200 {
+		return nil
+	}
+
+	return handleResponseError(resp)
 }
 
 func (c *NeptuneClient) DeleteProjectMember(project string, workspace string, username string) error {
@@ -64,23 +122,8 @@ func (c *NeptuneClient) DeleteProjectMember(project string, workspace string, us
 
 	projectIdentifier := fmt.Sprintf("%s/%s", workspace, project)
 
-	headers := map[string]string{
-		"authorization": fmt.Sprintf("Bearer %s", authToken),
-	}
+	data, err := buildDeleteProjectMemberRequestData(authToken, projectIdentifier, username)
 
-	params := map[string]string{
-		"projectIdentifier": projectIdentifier,
-	}
-
-	type reqBody struct {
-		UserId string `json:"userId"`
-	}
-
-	body := reqBody{
-		UserId: username,
-	}
-
-	bodyJson, err := json.Marshal(body)
 	if err != nil {
 		return err
 	}
@@ -92,7 +135,7 @@ func (c *NeptuneClient) DeleteProjectMember(project string, workspace string, us
 	}
 	endpoint := opData.Endpoint + "/" + username
 
-	req, err := prepareRequest(c.creds.tokenOriginAddress, endpoint, opData.Method, params, headers, bodyJson)
+	req, err := prepareRequest(c.creds.tokenOriginAddress, endpoint, opData.Method, data)
 	if err != nil {
 		return err
 	}
@@ -102,22 +145,16 @@ func (c *NeptuneClient) DeleteProjectMember(project string, workspace string, us
 		return err
 	}
 
-	if resp.StatusCode != 200 {
-		responseString, _ := getResponseMessage(resp)
-		return fmt.Errorf(responseString)
+	if resp.StatusCode == 200 {
+		return nil
 	}
 
-	return nil
+	return handleResponseError(resp)
 }
 
 func (c *NeptuneClient) UpdateProjectMember(project string, workspace string, username string, role string) error {
-	role = strings.ToLower(role)
-	if _, ok := map[string]bool{
-		"viewer":  true,
-		"member":  true,
-		"manager": true,
-	}[role]; !ok {
-		return fmt.Errorf("Unexpected 'role' argument value: '%s'", role)
+	if _, ok := roles[role]; !ok {
+		return fmt.Errorf("unexpected 'role' argument value: '%s'", role)
 	}
 
 	authToken, err := c.getAuthToken()
@@ -125,25 +162,9 @@ func (c *NeptuneClient) UpdateProjectMember(project string, workspace string, us
 		return err
 	}
 
-	projectIdentifier := fmt.Sprintf("%s/%s", workspace, project)
+	projectIdentifier := buildProjectIdentifier(workspace, project)
 
-	headers := map[string]string{
-		"authorization": fmt.Sprintf("Bearer %s", authToken),
-	}
-
-	params := map[string]string{
-		"projectIdentifier": projectIdentifier,
-	}
-
-	type reqBody struct {
-		Role string `json:"role"`
-	}
-
-	body := reqBody{
-		Role: role,
-	}
-
-	bodyJson, err := json.Marshal(body)
+	data, err := buildUpdateProjectMemberRequestData(authToken, projectIdentifier, username, role)
 	if err != nil {
 		return err
 	}
@@ -155,7 +176,7 @@ func (c *NeptuneClient) UpdateProjectMember(project string, workspace string, us
 	}
 	endpoint := opData.Endpoint + "/" + username
 
-	req, err := prepareRequest(c.creds.tokenOriginAddress, endpoint, opData.Method, params, headers, bodyJson)
+	req, err := prepareRequest(c.creds.tokenOriginAddress, endpoint, opData.Method, data)
 	if err != nil {
 		return err
 	}
@@ -165,10 +186,9 @@ func (c *NeptuneClient) UpdateProjectMember(project string, workspace string, us
 		return err
 	}
 
-	if resp.StatusCode != 200 {
-		responseString, _ := getResponseMessage(resp)
-		return fmt.Errorf(responseString)
+	if resp.StatusCode == 200 {
+		return nil
 	}
 
-	return nil
+	return handleResponseError(resp)
 }

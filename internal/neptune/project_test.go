@@ -56,11 +56,11 @@ func TestFormProjectBody(t *testing.T) {
 func TestVerifyCreateProjectArgs(t *testing.T) {
 	_, err := verifyCreateProjectArgs("", "some-workspace", "", "")
 	assert.Error(t, err)
-	assert.Contains(t, err.Error(), "Project name length should be at least 3 characters.")
+	assert.Contains(t, err.Error(), "project name length should be at least 3 characters.")
 
 	_, err = verifyCreateProjectArgs("SomeProject", "SomeWorkspace", "", "Wrong-visibility")
 	assert.Error(t, err)
-	assert.Contains(t, err.Error(), "Unsupported visibility type")
+	assert.Contains(t, err.Error(), "unsupported visibility type")
 
 	project, err := verifyCreateProjectArgs("SomeName", "SomeWorkspace", "", "")
 	assert.NoError(t, err)
