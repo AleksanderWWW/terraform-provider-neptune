@@ -63,7 +63,7 @@ func buildDeleteProjectMemberRequestData(authToken, projectIdentifier, username 
 	return newRequestData(headers, params, bodyJson), nil
 }
 
-func buildUpdateProjectMemberRequestData(authToken, projectIdentifier, username, role string) (*requestData, error) {
+func buildUpdateProjectMemberRequestData(authToken, projectIdentifier, role string) (*requestData, error) {
 	headers := map[string]string{
 		"authorization": fmt.Sprintf("Bearer %s", authToken),
 	}
@@ -164,7 +164,7 @@ func (c *NeptuneClient) UpdateProjectMember(project string, workspace string, us
 
 	projectIdentifier := buildProjectIdentifier(workspace, project)
 
-	data, err := buildUpdateProjectMemberRequestData(authToken, projectIdentifier, username, role)
+	data, err := buildUpdateProjectMemberRequestData(authToken, projectIdentifier, role)
 	if err != nil {
 		return err
 	}
