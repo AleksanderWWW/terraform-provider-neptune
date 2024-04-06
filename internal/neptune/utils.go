@@ -27,14 +27,19 @@ var roles = map[string]bool{
 	"manager": true,
 }
 
-func prepareRequest(host string, endpoint string, method string, params map[string]string, headers map[string]string, body []byte) (*http.Request, error) {
+func prepareRequest(host string, endpoint string, method string, data *requestData) (*http.Request, error) {
 	baseURL := fmt.Sprintf("%s/%s", host, endpoint)
-	req, err := http.NewRequest(method, baseURL, bytes.NewReader(body))
+	req, err := http.NewRequest(method, baseURL, bytes.NewReader(data.bodyJson))
 	if err != nil {
 		return nil, err
 	}
 
-	// Default request headers
+	req = addParams(addHeaders(addDefaultHeaders(req, host), data.headers), data.params)
+
+	return req, nil
+}
+
+func addDefaultHeaders(req *http.Request, host string) *http.Request {
 	req.Header.Add("Content-Type", "application/json")
 	req.Header.Add("authority", host)
 	req.Header.Add("accept", "*/*")
@@ -44,17 +49,25 @@ func prepareRequest(host string, endpoint string, method string, params map[stri
 	req.Header.Set("Sec-Fetch-Site", "same-origin")
 	req.Header.Set("Connection", "keep-alive")
 
+	return req
+}
+
+func addHeaders(req *http.Request, headers map[string]string) *http.Request {
 	for key, val := range headers {
 		req.Header.Add(key, val)
 	}
 
+	return req
+}
+
+func addParams(req *http.Request, params map[string]string) *http.Request {
 	q := req.URL.Query()
 	for key, val := range params {
 		q.Set(key, val)
 	}
 	req.URL.RawQuery = q.Encode()
 
-	return req, nil
+	return req
 }
 
 func decodeAPIToken(apiToken string) (map[string]string, error) {
@@ -80,7 +93,7 @@ func getApiToken(apiToken string) (string, error) {
 	}
 	_apiToken, ok := os.LookupEnv(NeptuneApiToken)
 	if !ok {
-		return "", fmt.Errorf("Neptune api token not found")
+		return "", fmt.Errorf("neptune api token not found")
 	}
 	return _apiToken, nil
 }
@@ -107,4 +120,17 @@ func shouldAllowSelfSignedCertificates() bool {
 	envVal = string(strings.ToLower(envVal)[0])
 
 	return (envVal == "t" || envVal == "1")
+}
+
+func buildProjectIdentifier(workspace, name string) string {
+	return fmt.Sprintf("%s/%s", workspace, name)
+}
+
+func handleResponseError(resp *http.Response) error {
+	responseString, err := getResponseMessage(resp)
+	if err != nil {
+		return err
+	}
+
+	return fmt.Errorf(responseString)
 }

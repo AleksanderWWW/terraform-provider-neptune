@@ -15,15 +15,16 @@ func (c *NeptuneClient) getAuthToken() (string, error) {
 		"X-Neptune-Api-Token": c.creds.apiToken,
 	}
 
-	resp, err := c.do("auth", nil, headers, nil)
+	data := &requestData{headers: headers, params: nil, bodyJson: nil}
+
+	resp, err := c.do("auth", data)
 	if err != nil {
 		return "", err
 	}
 	defer resp.Body.Close()
 
 	if resp.StatusCode != 200 {
-		responseString, _ := getResponseMessage(resp)
-		return "", fmt.Errorf(responseString)
+		return "", handleResponseError(resp)
 	}
 
 	err = json.NewDecoder(resp.Body).Decode(&respJson)
@@ -46,7 +47,9 @@ func (c *NeptuneClient) getWorkspaceId(authToken string, workspaceName string) (
 		"authorization": fmt.Sprintf("Bearer %s", authToken),
 	}
 
-	resp, err := c.do("listOrganizations", nil, headers, nil)
+	data := &requestData{headers: headers, params: nil, bodyJson: nil}
+
+	resp, err := c.do("listOrganizations", data)
 
 	if err != nil {
 		return "", err
@@ -64,5 +67,5 @@ func (c *NeptuneClient) getWorkspaceId(authToken string, workspaceName string) (
 			return workspace.Id, nil
 		}
 	}
-	return "", fmt.Errorf("Workspace '%s' not found", workspaceName)
+	return "", fmt.Errorf("workspace '%s' not found", workspaceName)
 }

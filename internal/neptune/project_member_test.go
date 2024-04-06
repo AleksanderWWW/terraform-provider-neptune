@@ -21,7 +21,7 @@ func TestAddProjectMember(t *testing.T) {
 		{
 			label:         "test invalid role",
 			resps:         []*http.Response{},
-			expectedError: fmt.Errorf("Unknown role 'TestRole'"),
+			expectedError: fmt.Errorf("unknown role 'TestRole'"),
 			role:          "TestRole",
 		},
 		{
@@ -74,8 +74,8 @@ func TestAddProjectMember(t *testing.T) {
 					},
 				},
 			},
-			errs:          []error{nil, fmt.Errorf("Error sending request")},
-			expectedError: fmt.Errorf("Error sending request"),
+			errs:          []error{nil, fmt.Errorf("error sending request")},
+			expectedError: fmt.Errorf("error sending request"),
 			role:          "member",
 		},
 		{
@@ -231,7 +231,7 @@ func TestUpdateProjectMember(t *testing.T) {
 		{
 			label:         "test invalid role",
 			resps:         []*http.Response{},
-			expectedError: fmt.Errorf("Unexpected 'role' argument value: 'testrole'"),
+			expectedError: fmt.Errorf("unexpected 'role' argument value: 'TestRole'"),
 			role:          "TestRole",
 		},
 		{

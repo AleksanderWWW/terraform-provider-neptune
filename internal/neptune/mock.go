@@ -53,7 +53,7 @@ func (mhc *MockHttpClient) Do(req *http.Request) (*http.Response, error) {
 	}
 
 	if mhc.index >= len(mhc.errs) {
-		err = fmt.Errorf("Too few errors provided for mock http client")
+		err = fmt.Errorf("too few errors provided for mock http client")
 	} else {
 		err = mhc.errs[mhc.index]
 	}
