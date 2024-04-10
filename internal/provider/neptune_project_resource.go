@@ -176,7 +176,7 @@ func (r *NeptuneProjectResource) Delete(ctx context.Context, req resource.Delete
 	err := r.client.DeleteProject(data.Name.ValueString(), data.Workspace.ValueString())
 
 	if err != nil {
-		if strings.Contains(err.Error(), "not found") {
+		if strings.Contains(err.Error(), "deleteProjectNotFound") {
 			resp.Diagnostics.AddWarning("Project does not exist", err.Error())
 		} else {
 			resp.Diagnostics.AddError(
