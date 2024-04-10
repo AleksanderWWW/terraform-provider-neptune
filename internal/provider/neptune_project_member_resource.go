@@ -203,7 +203,8 @@ func (r *NeptuneProjectMemberResource) Delete(ctx context.Context, req resource.
 		} else {
 			resp.Diagnostics.AddError(
 				"Error removing project member",
-				"Could not remove project member, unexpected error: "+err.Error(),
+				"Could not remove project member, unexpected error: "+err.Error()+
+					"Data: "+data.Project.ValueString()+data.Workspace.ValueString()+data.Username.ValueString(),
 			)
 			return
 		}
