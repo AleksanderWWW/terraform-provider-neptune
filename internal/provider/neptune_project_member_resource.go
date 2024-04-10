@@ -193,18 +193,31 @@ func (r *NeptuneProjectMemberResource) Delete(ctx context.Context, req resource.
 		return
 	}
 
-	err := r.client.DeleteProjectMember(data.Project.ValueString(), data.Workspace.ValueString(), data.Username.ValueString())
+	// Check if user is in project
+	members, err := r.client.ListProjectMembers(data.Project.ValueString(), data.Workspace.ValueString())
+	if err != nil {
+		resp.Diagnostics.AddError(
+			"Error removing project member",
+			"Could not remove project member, unexpected error: "+err.Error())
+		return
+	}
+
+	if !neptune.IsMemberInProject(members, data.Username.ValueString()) {
+		resp.Diagnostics.AddWarning(
+			"Project member not found", "User "+data.Username.ValueString()+" not in project "+data.Project.ValueString(),
+		)
+		return
+	}
+
+	err = r.client.DeleteProjectMember(data.Project.ValueString(), data.Workspace.ValueString(), data.Username.ValueString())
 
 	if err != nil {
-		if strings.Contains(err.Error(), "USER_NOT_IN_PROJECT") {
-			resp.Diagnostics.AddWarning("Project member not found", err.Error())
-		} else if strings.Contains(err.Error(), "404") {
+		if strings.Contains(err.Error(), "404") {
 			return
 		} else {
 			resp.Diagnostics.AddError(
 				"Error removing project member",
-				"Could not remove project member, unexpected error: "+err.Error()+
-					"Data: "+data.Project.ValueString()+data.Workspace.ValueString()+data.Username.ValueString(),
+				"Could not remove project member, unexpected error: "+err.Error(),
 			)
 			return
 		}

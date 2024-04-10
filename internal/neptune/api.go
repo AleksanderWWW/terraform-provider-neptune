@@ -188,3 +188,21 @@ func (nc *NeptuneClient) DeleteProjectMember(name, workspace, username string) e
 	_, err = nc.apiClient.Operations.DeleteProjectMember(params, auth)
 	return err
 }
+
+func (nc *NeptuneClient) ListProjectMembers(name, workspace string) ([]*models.ProjectMemberDTO, error) {
+	auth, err := nc.NewManagementAuthenticator()
+	if err != nil {
+		return nil, err
+	}
+
+	params := &operations.ListProjectMembersParams{
+		ProjectIdentifier: fmt.Sprintf("%s/%s", workspace, name),
+	}
+
+	res, err := nc.apiClient.Operations.ListProjectMembers(params, auth)
+	if err != nil {
+		return nil, err
+	}
+
+	return res.Payload, nil
+}
