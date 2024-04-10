@@ -158,7 +158,9 @@ func (r *NeptuneProjectMemberResource) Update(ctx context.Context, req resource.
 		data.Username.ValueString(),
 		data.Role.ValueString(),
 	); err != nil {
-		if strings.Contains(err.Error(), "not found") {
+		if strings.Contains(err.Error(), "addProjectMemberConflict") {
+			resp.Diagnostics.AddWarning("User already in the project", err.Error())
+		} else if strings.Contains(err.Error(), "not found") {
 			resp.Diagnostics.AddWarning("User or project not found", err.Error())
 		} else {
 			resp.Diagnostics.AddError(
