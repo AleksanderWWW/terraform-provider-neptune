@@ -15,7 +15,7 @@ import (
 	cr "github.com/go-openapi/runtime/client"
 	"github.com/go-openapi/strfmt"
 
-	"client/models"
+	"terraform-provider-neptune/internal/neptune/models"
 )
 
 // NewUpdateProjectParams creates a new UpdateProjectParams object,

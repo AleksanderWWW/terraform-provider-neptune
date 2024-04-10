@@ -12,7 +12,7 @@ import (
 	"github.com/go-openapi/runtime"
 	"github.com/go-openapi/strfmt"
 
-	"client/models"
+	"terraform-provider-neptune/internal/neptune/models"
 )
 
 // GetUserProfileReader is a Reader for the GetUserProfile structure.

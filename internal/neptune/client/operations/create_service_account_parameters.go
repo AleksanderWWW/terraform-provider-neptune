@@ -16,7 +16,7 @@ import (
 	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
 
-	"client/models"
+	"terraform-provider-neptune/internal/neptune/models"
 )
 
 // NewCreateServiceAccountParams creates a new CreateServiceAccountParams object,

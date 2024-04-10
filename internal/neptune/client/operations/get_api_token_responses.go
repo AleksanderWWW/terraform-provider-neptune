@@ -12,7 +12,7 @@ import (
 	"github.com/go-openapi/runtime"
 	"github.com/go-openapi/strfmt"
 
-	"client/models"
+	"terraform-provider-neptune/internal/neptune/models"
 )
 
 // GetAPITokenReader is a Reader for the GetAPIToken structure.

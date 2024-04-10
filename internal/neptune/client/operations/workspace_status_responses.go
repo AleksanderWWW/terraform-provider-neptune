@@ -12,7 +12,7 @@ import (
 	"github.com/go-openapi/runtime"
 	"github.com/go-openapi/strfmt"
 
-	"client/models"
+	"terraform-provider-neptune/internal/neptune/models"
 )
 
 // WorkspaceStatusReader is a Reader for the WorkspaceStatus structure.
