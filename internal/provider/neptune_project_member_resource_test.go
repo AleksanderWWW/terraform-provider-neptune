@@ -53,13 +53,19 @@ func TestAccNeptuneProjectMemberResource(t *testing.T) {
 			// Update testing
 			{
 				Config: providerConfig + fmt.Sprintf(`
+				resource "neptune_project" "test" {
+					name      = "%s"
+					workspace = "e2e-tests"
+				}
+
 				resource "neptune_project_member" "test_member" {
+					depends_on = [neptune_project.test]
 					project   = "%s"
 					workspace = "e2e-tests"
 					username  = "e2e.regularuser"
 					role      = "viewer"
 				  }
-				`, projectName),
+				`, projectName, projectName),
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("neptune_project_member.test_member", "project", projectName),
 					resource.TestCheckResourceAttr("neptune_project_member.test_member", "workspace", "e2e-tests"),

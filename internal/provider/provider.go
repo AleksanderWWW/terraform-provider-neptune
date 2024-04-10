@@ -72,7 +72,7 @@ func (p *NeptuneProvider) Configure(ctx context.Context, req provider.ConfigureR
 	// if data.Endpoint.IsNull() { /* ... */ }
 
 	// Example client configuration for data sources and resources
-	client, err := neptune.NewNeptuneClient(data.ApiToken.ValueString(), data.Timeout.ValueInt64())
+	credentials, err := neptune.NewCredentials(data.ApiToken.ValueString())
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Unable to Create Neptune API Client",
@@ -82,6 +82,7 @@ func (p *NeptuneProvider) Configure(ctx context.Context, req provider.ConfigureR
 		)
 		return
 	}
+	client := neptune.NewNeptuneClient(credentials)
 	resp.DataSourceData = client
 	resp.ResourceData = client
 }

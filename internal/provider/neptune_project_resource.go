@@ -96,12 +96,11 @@ func (r *NeptuneProjectResource) Create(ctx context.Context, req resource.Create
 	err := r.client.CreateProject(
 		data.Name.ValueString(),
 		data.Workspace.ValueString(),
-		data.Key.ValueString(),
 		data.Vis.ValueString(),
 	)
 
 	if err != nil {
-		if strings.Contains(err.Error(), "PROJECT_NAME_COLLISION") {
+		if strings.Contains(err.Error(), "createProject (status 409)") {
 			resp.Diagnostics.AddWarning("Project already exists", err.Error())
 		} else {
 			resp.Diagnostics.AddError(
@@ -177,7 +176,7 @@ func (r *NeptuneProjectResource) Delete(ctx context.Context, req resource.Delete
 	err := r.client.DeleteProject(data.Name.ValueString(), data.Workspace.ValueString())
 
 	if err != nil {
-		if strings.Contains(err.Error(), "not found") {
+		if strings.Contains(err.Error(), "deleteProjectNotFound") {
 			resp.Diagnostics.AddWarning("Project does not exist", err.Error())
 		} else {
 			resp.Diagnostics.AddError(

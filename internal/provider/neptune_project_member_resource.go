@@ -101,7 +101,7 @@ func (r *NeptuneProjectMemberResource) Create(ctx context.Context, req resource.
 	)
 
 	if err != nil {
-		if strings.Contains(err.Error(), "User already has permissions to the project") {
+		if strings.Contains(err.Error(), "addProjectMemberConflict") {
 			resp.Diagnostics.AddWarning("Project member already exists", err.Error())
 		} else {
 			resp.Diagnostics.AddError(
@@ -158,7 +158,9 @@ func (r *NeptuneProjectMemberResource) Update(ctx context.Context, req resource.
 		data.Username.ValueString(),
 		data.Role.ValueString(),
 	); err != nil {
-		if strings.Contains(err.Error(), "not found") {
+		if strings.Contains(err.Error(), "addProjectMemberConflict") {
+			resp.Diagnostics.AddWarning("User already in the project", err.Error())
+		} else if strings.Contains(err.Error(), "not found") {
 			resp.Diagnostics.AddWarning("User or project not found", err.Error())
 		} else {
 			resp.Diagnostics.AddError(
@@ -191,12 +193,32 @@ func (r *NeptuneProjectMemberResource) Delete(ctx context.Context, req resource.
 		return
 	}
 
-	err := r.client.DeleteProjectMember(data.Project.ValueString(), data.Workspace.ValueString(), data.Username.ValueString())
+	// Check if user is in project
+	members, err := r.client.ListProjectMembers(data.Project.ValueString(), data.Workspace.ValueString())
+	if err != nil {
+		resp.Diagnostics.AddError(
+			"Error removing project member",
+			"Could not remove project member, unexpected error: "+err.Error())
+		return
+	}
+
+	if !neptune.IsMemberInProject(members, data.Username.ValueString()) {
+		resp.Diagnostics.AddWarning(
+			"Project member not found", "User "+data.Username.ValueString()+" not in project "+data.Project.ValueString(),
+		)
+		return
+	}
+
+	err = r.client.DeleteProjectMember(data.Project.ValueString(), data.Workspace.ValueString(), data.Username.ValueString())
 
 	if err != nil {
-		if strings.Contains(err.Error(), "USER_NOT_IN_PROJECT") {
-			resp.Diagnostics.AddWarning("Project member not found", err.Error())
-		} else if strings.Contains(err.Error(), "404") {
+		if strings.Contains(err.Error(), "deleteProjectMemberUnprocessableEntity") {
+			msg := fmt.Sprintf("User '%s' does not exist or has no access to project '%s/%s'. ",
+				data.Username.ValueString(),
+				data.Workspace.ValueString(),
+				data.Project.ValueString(),
+			)
+			resp.Diagnostics.AddWarning(msg, "If the project visibility is set to 'workspace', a user cannot be added or removed.")
 			return
 		} else {
 			resp.Diagnostics.AddError(

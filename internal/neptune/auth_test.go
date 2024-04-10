@@ -10,7 +10,9 @@ import (
 )
 
 func TestCredentialsSuccess(t *testing.T) {
-	jsonData, err := json.Marshal(map[string]string{"api_address": "someAddress"})
+	jsonData, err := json.Marshal(map[string]string{
+		"api_address": "https://someAddress",
+	})
 	assert.NoError(t, err)
 
 	// Encode to base64
