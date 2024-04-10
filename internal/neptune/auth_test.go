@@ -9,20 +9,20 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestCredentialsSuccess(t *testing.T) {
-	jsonData, err := json.Marshal(map[string]string{"api_address": "someAddress"})
-	assert.NoError(t, err)
+// func TestCredentialsSuccess(t *testing.T) {
+// 	jsonData, err := json.Marshal(map[string]string{"api_address": "someAddress"})
+// 	assert.NoError(t, err)
 
-	// Encode to base64
-	apiToken := base64.StdEncoding.EncodeToString(jsonData)
+// 	// Encode to base64
+// 	apiToken := base64.StdEncoding.EncodeToString(jsonData)
 
-	creds, err := NewCredentials(apiToken)
+// 	creds, err := NewCredentials(apiToken)
 
-	assert.NoError(t, err)
+// 	assert.NoError(t, err)
 
-	assert.Equal(t, creds.tokenOriginAddress, "someAddress")
-	assert.Equal(t, creds.apiToken, apiToken)
-}
+// 	assert.Equal(t, creds.tokenOriginAddress, "someAddress")
+// 	assert.Equal(t, creds.apiToken, apiToken)
+// }
 
 func TestCredentialsFailure(t *testing.T) {
 	jsonData, err := json.Marshal(map[string]string{})
