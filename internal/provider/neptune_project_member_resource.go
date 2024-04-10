@@ -212,7 +212,13 @@ func (r *NeptuneProjectMemberResource) Delete(ctx context.Context, req resource.
 	err = r.client.DeleteProjectMember(data.Project.ValueString(), data.Workspace.ValueString(), data.Username.ValueString())
 
 	if err != nil {
-		if strings.Contains(err.Error(), "404") {
+		if strings.Contains(err.Error(), "deleteProjectMemberUnprocessableEntity") {
+			msg := fmt.Sprintf("User '%s' does not exist or has no access to project '%s/%s'. ",
+				data.Username.ValueString(),
+				data.Workspace.ValueString(),
+				data.Project.ValueString(),
+			)
+			resp.Diagnostics.AddWarning(msg, "If the project visibility is set to 'workspace', a user cannot be added or removed.")
 			return
 		} else {
 			resp.Diagnostics.AddError(
