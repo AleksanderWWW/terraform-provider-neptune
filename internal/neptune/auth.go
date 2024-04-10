@@ -4,6 +4,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"os"
 	"strings"
 
 	"github.com/go-openapi/runtime"
@@ -33,6 +34,9 @@ func decodeAPIToken(apiToken string) (map[string]string, error) {
 }
 
 func NewCredentials(apiToken string) (*credentials, error) {
+	if apiToken == "" {
+		apiToken = os.Getenv(NeptuneApiToken)
+	}
 	tokenDict, err := decodeAPIToken(apiToken)
 	if err != nil {
 		return nil, err
