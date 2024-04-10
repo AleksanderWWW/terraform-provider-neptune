@@ -96,7 +96,6 @@ func (r *NeptuneProjectResource) Create(ctx context.Context, req resource.Create
 	err := r.client.CreateProject(
 		data.Name.ValueString(),
 		data.Workspace.ValueString(),
-		data.Key.ValueString(),
 		data.Vis.ValueString(),
 	)
 
