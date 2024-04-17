@@ -5,7 +5,6 @@ package provider
 
 import (
 	"context"
-	"terraform-provider-neptune/internal/neptune"
 
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/provider"
@@ -28,7 +27,6 @@ type NeptuneProvider struct {
 // ScaffoldingProviderModel describes the provider data model.
 type NeptuneProviderModel struct {
 	ApiToken types.String `tfsdk:"api_token"`
-	Timeout  types.Int64  `tfsdk:"timeout"`
 }
 
 func (p *NeptuneProvider) Metadata(ctx context.Context, req provider.MetadataRequest, resp *provider.MetadataResponse) {
@@ -43,16 +41,14 @@ func (p *NeptuneProvider) Schema(ctx context.Context, req provider.SchemaRequest
 				MarkdownDescription: "Your Neptune.ai api token.",
 				Optional:            true,
 			},
-			"timeout": schema.Int64Attribute{
-				MarkdownDescription: "Timeout for neptune client.",
-				Optional:            true,
-			},
 		},
 	}
 }
 
 func (p *NeptuneProvider) Configure(ctx context.Context, req provider.ConfigureRequest, resp *provider.ConfigureResponse) {
 	var data NeptuneProviderModel
+	var apiToken *string
+	var apiTokenStr string = ""
 
 	resp.Diagnostics.Append(req.Config.Get(ctx, &data)...)
 
@@ -61,30 +57,14 @@ func (p *NeptuneProvider) Configure(ctx context.Context, req provider.ConfigureR
 	}
 
 	if data.ApiToken.IsNull() {
-		data.ApiToken = types.StringValue("")
+		apiToken = nil
+	} else {
+		apiTokenStr = data.ApiToken.String()
+		apiToken = &apiTokenStr
 	}
 
-	if data.Timeout.IsNull() {
-		data.Timeout = types.Int64Value(30)
-	}
-
-	// Configuration values are now available.
-	// if data.Endpoint.IsNull() { /* ... */ }
-
-	// Example client configuration for data sources and resources
-	credentials, err := neptune.NewCredentials(data.ApiToken.ValueString())
-	if err != nil {
-		resp.Diagnostics.AddError(
-			"Unable to Create Neptune API Client",
-			"An unexpected error occurred when creating the Neptune API client. "+
-				"If the error is not clear, please contact the provider developers.\n\n"+
-				"Neptune Client Error: "+err.Error(),
-		)
-		return
-	}
-	client := neptune.NewNeptuneClient(credentials)
-	resp.DataSourceData = client
-	resp.ResourceData = client
+	resp.DataSourceData = apiToken
+	resp.ResourceData = apiToken
 }
 
 func (p *NeptuneProvider) Resources(ctx context.Context) []func() resource.Resource {

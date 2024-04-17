@@ -23,7 +23,7 @@ func NewNeptuneProjectResource() resource.Resource {
 
 // ExampleResource defines the resource implementation.
 type NeptuneProjectResource struct {
-	client *neptune.NeptuneClient
+	apiToken *string
 }
 
 // ExampleResourceModel describes the resource data model.
@@ -70,18 +70,18 @@ func (r *NeptuneProjectResource) Configure(ctx context.Context, req resource.Con
 		return
 	}
 
-	client, ok := req.ProviderData.(*neptune.NeptuneClient)
+	apiToken, ok := req.ProviderData.(*string)
 
 	if !ok {
 		resp.Diagnostics.AddError(
 			"Unexpected Resource Configure Type",
-			fmt.Sprintf("Expected *neptune.NeptuneClient, got: %T. Please report this issue to the provider developers.", req.ProviderData),
+			fmt.Sprintf("Expected *string, got: %T. Please report this issue to the provider developers.", req.ProviderData),
 		)
 
 		return
 	}
 
-	r.client = client
+	r.apiToken = apiToken
 }
 
 func (r *NeptuneProjectResource) Create(ctx context.Context, req resource.CreateRequest, resp *resource.CreateResponse) {
@@ -93,10 +93,11 @@ func (r *NeptuneProjectResource) Create(ctx context.Context, req resource.Create
 	if resp.Diagnostics.HasError() {
 		return
 	}
-	err := r.client.CreateProject(
+	err := neptune.CreateProject(
 		data.Name.ValueString(),
 		data.Workspace.ValueString(),
 		data.Vis.ValueString(),
+		r.apiToken,
 	)
 
 	if err != nil {
@@ -173,7 +174,7 @@ func (r *NeptuneProjectResource) Delete(ctx context.Context, req resource.Delete
 		return
 	}
 
-	err := r.client.DeleteProject(data.Name.ValueString(), data.Workspace.ValueString())
+	err := neptune.DeleteProject(data.Name.ValueString(), data.Workspace.ValueString(), r.apiToken)
 
 	if err != nil {
 		if strings.Contains(err.Error(), "deleteProjectNotFound") {

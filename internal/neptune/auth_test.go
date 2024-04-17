@@ -18,12 +18,12 @@ func TestCredentialsSuccess(t *testing.T) {
 	// Encode to base64
 	apiToken := base64.StdEncoding.EncodeToString(jsonData)
 
-	creds, err := NewCredentials(apiToken)
+	creds, err := newCredentials(&apiToken)
 
 	assert.NoError(t, err)
 
 	assert.Equal(t, creds.tokenOriginAddress, "someAddress")
-	assert.Equal(t, creds.apiToken, apiToken)
+	assert.Equal(t, creds.apiTokenStr, apiToken)
 }
 
 func TestCredentialsFailure(t *testing.T) {
@@ -33,20 +33,21 @@ func TestCredentialsFailure(t *testing.T) {
 	// Encode to base64
 	apiToken := base64.StdEncoding.EncodeToString(jsonData)
 
-	creds, err := NewCredentials(apiToken)
+	creds, err := newCredentials(&apiToken)
 
 	assert.Error(t, err)
 	assert.Nil(t, creds)
 }
 
 func TestCredentialsWrongToken(t *testing.T) {
-	creds, err := NewCredentials("wrongToken")
+	token := "wrongToken"
+	creds, err := newCredentials(&token)
 
 	assert.Error(t, err)
 	assert.Nil(t, creds)
 
 	os.Unsetenv(NeptuneApiToken)
-	creds, err = NewCredentials("")
+	creds, err = newCredentials(nil)
 
 	assert.Error(t, err)
 	assert.Nil(t, creds)

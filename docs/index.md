@@ -18,4 +18,3 @@ description: |-
 ### Optional
 
 - `api_token` (String) Your Neptune.ai api token.
-- `timeout` (Number) Timeout for neptune client.
