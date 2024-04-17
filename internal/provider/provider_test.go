@@ -20,9 +20,7 @@ const (
 	// It is also possible to use the HASHICUPS_ environment variables instead,
 	// such as updating the Makefile and running the testing through that tool.
 	providerConfig = `
-  provider "neptune" {
-	api_token = ""
-  }
+  provider "neptune" {}
   `
 )
 

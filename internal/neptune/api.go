@@ -2,52 +2,16 @@ package neptune
 
 import (
 	"fmt"
-	"terraform-provider-neptune/internal/neptune/client"
 	"terraform-provider-neptune/internal/neptune/client/operations"
 	"terraform-provider-neptune/internal/neptune/models"
 
 	"github.com/go-openapi/strfmt"
 )
 
-const NeptuneApiToken string = "NEPTUNE_API_TOKEN"
-
-type NeptuneClient struct {
-	apiClient *client.Neptune
-	creds     *credentials
-}
-
-func NewNeptuneClient(creds *credentials) *NeptuneClient {
-	return &NeptuneClient{
-		apiClient: client.NewHTTPClientWithConfig(strfmt.Default, &client.TransportConfig{
-			Host:    creds.tokenOriginAddress,
-			Schemes: []string{"https"},
-		}),
-		creds: creds,
-	}
-}
-
-func (nc *NeptuneClient) NewManagementAuthenticator() (*NeptuneManagementAuthenticator, error) {
-	auth := &DefaultAuthenticator{}
-	authTokenDTO, err := nc.apiClient.Operations.ExchangeAPIToken(
-		&operations.ExchangeAPITokenParams{
-			XNeptuneAPIToken: nc.creds.apiToken,
-		},
-		auth,
+func getWorkspaceID(name string, apiClient *neptuneApiClient) (strfmt.UUID, error) {
+	organizationDTOs, err := apiClient.backendClient.Operations.ListOrganizations(
+		&operations.ListOrganizationsParams{}, apiClient.auth,
 	)
-	if err != nil {
-		return nil, err
-	}
-	authToken := authTokenDTO.Payload.AccessToken
-	return &NeptuneManagementAuthenticator{authToken: *authToken}, nil
-}
-
-func (nc *NeptuneClient) getWorkspaceID(name string) (strfmt.UUID, error) {
-	auth, err := nc.NewManagementAuthenticator()
-	if err != nil {
-		return "", err
-	}
-
-	organizationDTOs, err := nc.apiClient.Operations.ListOrganizations(&operations.ListOrganizationsParams{}, auth)
 	if err != nil {
 		return "", err
 	}
@@ -61,15 +25,15 @@ func (nc *NeptuneClient) getWorkspaceID(name string) (strfmt.UUID, error) {
 	return "", fmt.Errorf("Workspace '%s' not found", name)
 }
 
-func (nc *NeptuneClient) CreateProject(name, workspace, visibility string) error {
-	visDTO := getVisibilityDTO(visibility)
-
-	auth, err := nc.NewManagementAuthenticator()
+func CreateProject(name, workspace, visibility string, apiToken *string) error {
+	apiClient, err := newNeptuneApiClient(apiToken)
 	if err != nil {
 		return err
 	}
 
-	orgId, err := nc.getWorkspaceID(workspace)
+	visDTO := getVisibilityDTO(visibility)
+
+	orgId, err := getWorkspaceID(workspace, apiClient)
 	if err != nil {
 		return err
 	}
@@ -81,7 +45,7 @@ func (nc *NeptuneClient) CreateProject(name, workspace, visibility string) error
 			Visibility:     *models.NewProjectVisibilityDTO(visDTO),
 		},
 	}
-	_, err = nc.apiClient.Operations.CreateProject(&params, auth)
+	_, err = apiClient.backendClient.Operations.CreateProject(&params, apiClient.auth)
 	return err
 }
 
@@ -102,8 +66,8 @@ func getVisibilityDTO(visibility string) models.ProjectVisibilityDTO {
 	return visDTO
 }
 
-func (nc *NeptuneClient) DeleteProject(name, workspace string) error {
-	auth, err := nc.NewManagementAuthenticator()
+func DeleteProject(name, workspace string, apiToken *string) error {
+	apiClient, err := newNeptuneApiClient(apiToken)
 	if err != nil {
 		return err
 	}
@@ -112,12 +76,12 @@ func (nc *NeptuneClient) DeleteProject(name, workspace string) error {
 		ProjectIdentifier: fmt.Sprintf("%s/%s", workspace, name),
 	}
 
-	_, err = nc.apiClient.Operations.DeleteProject(params, auth)
+	_, err = apiClient.backendClient.Operations.DeleteProject(params, apiClient.auth)
 	return err
 }
 
-func (nc *NeptuneClient) AddProjectMember(name, workspace, username, role string) error {
-	auth, err := nc.NewManagementAuthenticator()
+func AddProjectMember(name, workspace, username, role string, apiToken *string) error {
+	apiClient, err := newNeptuneApiClient(apiToken)
 	if err != nil {
 		return err
 	}
@@ -134,7 +98,7 @@ func (nc *NeptuneClient) AddProjectMember(name, workspace, username, role string
 		ProjectIdentifier: fmt.Sprintf("%s/%s", workspace, name),
 	}
 
-	_, err = nc.apiClient.Operations.AddProjectMember(params, auth)
+	_, err = apiClient.backendClient.Operations.AddProjectMember(params, apiClient.auth)
 	return err
 }
 
@@ -152,8 +116,8 @@ func getProjectMemberRoleDTO(role string) models.ProjectRoleDTO {
 
 }
 
-func (nc *NeptuneClient) UpdateProjectMember(name, workspace, username, role string) error {
-	auth, err := nc.NewManagementAuthenticator()
+func UpdateProjectMember(name, workspace, username, role string, apiToken *string) error {
+	apiClient, err := newNeptuneApiClient(apiToken)
 	if err != nil {
 		return err
 	}
@@ -170,12 +134,12 @@ func (nc *NeptuneClient) UpdateProjectMember(name, workspace, username, role str
 		UserID:            username,
 	}
 
-	_, err = nc.apiClient.Operations.UpdateProjectMember(params, auth)
+	_, err = apiClient.backendClient.Operations.UpdateProjectMember(params, apiClient.auth)
 	return err
 }
 
-func (nc *NeptuneClient) DeleteProjectMember(name, workspace, username string) error {
-	auth, err := nc.NewManagementAuthenticator()
+func DeleteProjectMember(name, workspace, username string, apiToken *string) error {
+	apiClient, err := newNeptuneApiClient(apiToken)
 	if err != nil {
 		return err
 	}
@@ -185,12 +149,12 @@ func (nc *NeptuneClient) DeleteProjectMember(name, workspace, username string) e
 		UserID:            username,
 	}
 
-	_, err = nc.apiClient.Operations.DeleteProjectMember(params, auth)
+	_, err = apiClient.backendClient.Operations.DeleteProjectMember(params, apiClient.auth)
 	return err
 }
 
-func (nc *NeptuneClient) ListProjectMembers(name, workspace string) ([]*models.ProjectMemberDTO, error) {
-	auth, err := nc.NewManagementAuthenticator()
+func ListProjectMembers(name, workspace string, apiToken *string) ([]*models.ProjectMemberDTO, error) {
+	apiClient, err := newNeptuneApiClient(apiToken)
 	if err != nil {
 		return nil, err
 	}
@@ -199,7 +163,7 @@ func (nc *NeptuneClient) ListProjectMembers(name, workspace string) ([]*models.P
 		ProjectIdentifier: fmt.Sprintf("%s/%s", workspace, name),
 	}
 
-	res, err := nc.apiClient.Operations.ListProjectMembers(params, auth)
+	res, err := apiClient.backendClient.Operations.ListProjectMembers(params, apiClient.auth)
 	if err != nil {
 		return nil, err
 	}

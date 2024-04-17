@@ -23,7 +23,7 @@ func NewNeptuneProjectMemberResource() resource.Resource {
 
 // ExampleResource defines the resource implementation.
 type NeptuneProjectMemberResource struct {
-	client *neptune.NeptuneClient
+	apiToken *string
 }
 
 // ExampleResourceModel describes the resource data model.
@@ -70,18 +70,18 @@ func (r *NeptuneProjectMemberResource) Configure(ctx context.Context, req resour
 		return
 	}
 
-	client, ok := req.ProviderData.(*neptune.NeptuneClient)
+	apiToken, ok := req.ProviderData.(*string)
 
 	if !ok {
 		resp.Diagnostics.AddError(
 			"Unexpected Resource Configure Type",
-			fmt.Sprintf("Expected *neptune.NeptuneClient, got: %T. Please report this issue to the provider developers.", req.ProviderData),
+			fmt.Sprintf("Expected *string, got: %T. Please report this issue to the provider developers.", req.ProviderData),
 		)
 
 		return
 	}
 
-	r.client = client
+	r.apiToken = apiToken
 }
 
 func (r *NeptuneProjectMemberResource) Create(ctx context.Context, req resource.CreateRequest, resp *resource.CreateResponse) {
@@ -93,11 +93,12 @@ func (r *NeptuneProjectMemberResource) Create(ctx context.Context, req resource.
 	if resp.Diagnostics.HasError() {
 		return
 	}
-	err := r.client.AddProjectMember(
+	err := neptune.AddProjectMember(
 		data.Project.ValueString(),
 		data.Workspace.ValueString(),
 		data.Username.ValueString(),
 		data.Role.ValueString(),
+		r.apiToken,
 	)
 
 	if err != nil {
@@ -152,11 +153,12 @@ func (r *NeptuneProjectMemberResource) Update(ctx context.Context, req resource.
 		return
 	}
 
-	if err := r.client.UpdateProjectMember(
+	if err := neptune.UpdateProjectMember(
 		data.Project.ValueString(),
 		data.Workspace.ValueString(),
 		data.Username.ValueString(),
 		data.Role.ValueString(),
+		r.apiToken,
 	); err != nil {
 		if strings.Contains(err.Error(), "addProjectMemberConflict") {
 			resp.Diagnostics.AddWarning("User already in the project", err.Error())
@@ -194,7 +196,7 @@ func (r *NeptuneProjectMemberResource) Delete(ctx context.Context, req resource.
 	}
 
 	// Check if user is in project
-	members, err := r.client.ListProjectMembers(data.Project.ValueString(), data.Workspace.ValueString())
+	members, err := neptune.ListProjectMembers(data.Project.ValueString(), data.Workspace.ValueString(), r.apiToken)
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Error removing project member",
@@ -209,7 +211,7 @@ func (r *NeptuneProjectMemberResource) Delete(ctx context.Context, req resource.
 		return
 	}
 
-	err = r.client.DeleteProjectMember(data.Project.ValueString(), data.Workspace.ValueString(), data.Username.ValueString())
+	err = neptune.DeleteProjectMember(data.Project.ValueString(), data.Workspace.ValueString(), data.Username.ValueString(), r.apiToken)
 
 	if err != nil {
 		if strings.Contains(err.Error(), "deleteProjectMemberUnprocessableEntity") {

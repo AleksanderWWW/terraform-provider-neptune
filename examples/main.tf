@@ -6,9 +6,7 @@ terraform {
   }
 }
 
-provider "neptune" {
-  api_token = ""
-}
+provider "neptune" {}
 
 resource "neptune_project" "my_project" {
   name      = "Terraform-project"

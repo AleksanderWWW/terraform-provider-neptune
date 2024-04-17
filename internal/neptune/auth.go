@@ -11,8 +11,10 @@ import (
 	"github.com/go-openapi/strfmt"
 )
 
+const NeptuneApiToken string = "NEPTUNE_API_TOKEN"
+
 type credentials struct {
-	apiToken           string
+	apiTokenStr        string
 	tokenOriginAddress string
 }
 
@@ -33,11 +35,15 @@ func decodeAPIToken(apiToken string) (map[string]string, error) {
 	return result, nil
 }
 
-func NewCredentials(apiToken string) (*credentials, error) {
-	if apiToken == "" {
-		apiToken = os.Getenv(NeptuneApiToken)
+func newCredentials(apiToken *string) (*credentials, error) {
+	var apiTokenStr string
+
+	if apiToken == nil {
+		apiTokenStr = os.Getenv(NeptuneApiToken)
+	} else {
+		apiTokenStr = *apiToken
 	}
-	tokenDict, err := decodeAPIToken(apiToken)
+	tokenDict, err := decodeAPIToken(apiTokenStr)
 	if err != nil {
 		return nil, err
 	}
@@ -47,10 +53,12 @@ func NewCredentials(apiToken string) (*credentials, error) {
 		return nil, fmt.Errorf("invalid api token")
 	}
 
-	tokenOriginAddress = strings.Split(tokenOriginAddress, "//")[1]
+	if strings.Contains(tokenOriginAddress, "//") {
+		tokenOriginAddress = strings.Split(tokenOriginAddress, "//")[1]
+	}
 
 	return &credentials{
-		apiToken:           apiToken,
+		apiTokenStr:        apiTokenStr,
 		tokenOriginAddress: tokenOriginAddress,
 	}, nil
 }
