@@ -29,7 +29,7 @@ func decodeAPIToken(apiToken string) (map[string]string, error) {
 	var result map[string]string
 	err = json.Unmarshal(decodedBytes, &result)
 	if err != nil {
-		return nil, fmt.Errorf("failed to unmarshal JSON: %v", err)
+		return nil, fmt.Errorf("failed to unmarshal JSON (%v): %v", decodedBytes, err)
 	}
 
 	return result, nil
