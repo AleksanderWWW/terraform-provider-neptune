@@ -63,8 +63,8 @@ func (p *NeptuneProvider) Configure(ctx context.Context, req provider.ConfigureR
 		apiToken = &apiTokenStr
 	}
 
-	resp.DataSourceData = apiToken
 	resp.ResourceData = apiToken
+	resp.DataSourceData = apiToken
 }
 
 func (p *NeptuneProvider) Resources(ctx context.Context) []func() resource.Resource {
